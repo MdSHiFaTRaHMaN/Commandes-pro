@@ -1,15 +1,15 @@
-import {  Layout } from "antd";
+import { Layout } from "antd";
 import Navbar from "../components/Navbar";
 import { Outlet } from "react-router-dom";
+import Topbar from "../components/Topbar";
 const { Footer } = Layout;
 
-
 const Main = () => {
- 
   return (
     <Layout>
+      <Topbar />
       <Navbar />
-     <Outlet />
+      <Outlet />
       <Footer
         style={{
           textAlign: "center",
