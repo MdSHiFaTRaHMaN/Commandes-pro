@@ -1,6 +1,98 @@
-import { Button } from "antd";
+import { DownOutlined } from "@ant-design/icons";
+import { Button, Dropdown, Space } from "antd";
+import { Link } from "react-router-dom";
 
 const Navbar = () => {
+  const items = [
+    {
+      label: (
+        <Link
+          to="/products"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-lg font-semibold text-red-700 hover:text-blue-800"
+        >
+          PRODUCTS
+        </Link>
+      ),
+      key: "0",
+    },
+    {
+      label: (
+        <a
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-lg font-semibold text-red-700 hover:text-red-800"
+        >
+          ADD PRODUCT
+        </a>
+      ),
+      key: "1",
+    },
+    {
+      label: (
+        <a
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-lg font-semibold text-red-700 hover:text-blue-800"
+        >
+          CATEGORICS
+        </a>
+      ),
+      key: "2",
+    },
+  ];
+
+  const settingNav = [
+    {
+      label: (
+        <a
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-lg font-semibold text-red-700 hover:text-blue-800"
+        >
+          Users list
+        </a>
+      ),
+      key: "0",
+    },
+    {
+      label: (
+        <a
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-lg font-semibold text-red-700 hover:text-red-800"
+        >
+          Add user
+        </a>
+      ),
+      key: "1",
+    },
+    {
+      label: (
+        <a
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-lg font-semibold text-red-700 hover:text-blue-800"
+        >
+          App
+        </a>
+      ),
+      key: "2",
+    },
+    {
+      label: (
+        <a
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-lg font-semibold text-red-700 hover:text-blue-800"
+        >
+          Zip
+        </a>
+      ),
+      key: "3",
+    },
+  ];
   return (
     <nav className="bg-[#e24c80] shadow ">
       <div className="container px-6 py-4 mx-auto">
@@ -41,61 +133,80 @@ const Navbar = () => {
                 href="#"
                 className="mt-2 transition-colors duration-300 transform lg:mt-0 lg:mx-4 hover:text-gray-900"
               >
-                features
-              </a>
-              <a
-                href="#"
-                className="mt-2 transition-colors duration-300 transform lg:mt-0 lg:mx-4 hover:text-gray-900"
-              >
-                downloads
-              </a>
-              <a
-                href="#"
-                className="mt-2 transition-colors duration-300 transform lg:mt-0 lg:mx-4 hover:text-gray-900"
-              >
-                docs
-              </a>
-              <a
-                href="#"
-                className="mt-2 transition-colors duration-300 transform lg:mt-0 lg:mx-4 hover:text-gray-900"
-              >
-                support
-              </a>
-              <a
-                href="#"
-                className="mt-2 transition-colors duration-300 transform lg:mt-0 lg:mx-4 hover:text-gray-900"
-              >
-                blog
+                Dashboard
               </a>
 
-              <div className="relative mt-4 lg:mt-0 lg:mx-4">
-                <span className="absolute inset-y-0 left-0 flex items-center pl-3">
-                  <svg
-                    className="w-4 h-4 text-gray-600"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                  >
-                    <path
-                      d="M21 21L15 15M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 13.866 3 10C3 6.13401 6.13401 3 10 3C13.866 3 17 6.13401 17 10Z"
-                      stroke="currentColor"
-                    ></path>
-                  </svg>
-                </span>
+              <Dropdown
+                menu={{
+                  items,
+                }}
+              >
+                <a onClick={(e) => e.preventDefault()}>
+                  <Space>
+                    Products
+                    <DownOutlined />
+                  </Space>
+                </a>
+              </Dropdown>
 
-                <input
-                  type="text"
-                  className="w-full py-1 pl-10 pr-4 text-gray-700 placeholder-gray-600 bg-white border-b border-gray-600 lg:w-56 lg:border-transparent  focus:outline-none focus:border-gray-600"
-                  placeholder="Search"
-                />
-              </div>
+              <a
+                href="#"
+                className="mt-2 transition-colors duration-300 transform lg:mt-0 lg:mx-4 hover:text-gray-900"
+              >
+                Orders
+              </a>
+              <a
+                href="#"
+                className="mt-2 transition-colors duration-300 transform lg:mt-0 lg:mx-4 hover:text-gray-900"
+              >
+                Invoices
+              </a>
+              <a
+                href="#"
+                className="mt-2 transition-colors duration-300 transform lg:mt-0 lg:mx-4 hover:text-gray-900"
+              >
+                Credits
+              </a>
+              <a
+                href="#"
+                className="mt-2 transition-colors duration-300 transform lg:mt-0 lg:mx-4 hover:text-gray-900"
+              >
+                Clients
+              </a>
+              <a
+                href="#"
+                className="mt-2 transition-colors duration-300 transform lg:mt-0 lg:mx-4 hover:text-gray-900"
+              >
+                Settings
+              </a>
+              <Dropdown
+                menu={{
+                  items: settingNav,
+                }}
+              >
+                <a>
+                  <Space>
+                    Settings
+                    <DownOutlined />
+                  </Space>
+                </a>
+              </Dropdown>
             </div>
 
-            <div className="flex justify-center mt-6 lg:flex lg:mt-0 lg:-mx-2">
-              <Button color="danger" variant="outlined">
-                Outlined
+            <div className="flex justify-center gap-3 mt-6 lg:flex lg:mt-0 lg:-mx-2">
+              <Button
+                color="danger"
+                variant="outlined"
+                className="text-md font-semibold"
+              >
+                AJOUTER UNE CMD
               </Button>
-              <Button color="danger" variant="outlined">
-                Outlined
+              <Button
+                color="danger"
+                variant="outlined"
+                className="text-md font-semibold"
+              >
+                AJOUTER UN CLIENT
               </Button>
             </div>
           </div>
