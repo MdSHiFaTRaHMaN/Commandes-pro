@@ -8,9 +8,7 @@ const Navbar = () => {
       label: (
         <Link
           to="/products"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-lg font-semibold text-red-700 hover:text-blue-800"
+          className="text-md font-bold text-red-700 hover:text-blue-800"
         >
           PRODUCTS
         </Link>
@@ -19,25 +17,23 @@ const Navbar = () => {
     },
     {
       label: (
-        <a
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-lg font-semibold text-red-700 hover:text-red-800"
+        <Link
+          to="/addtoproduct"
+          className="text-md font-bold text-red-700 hover:text-red-800"
         >
-          ADD PRODUCT
-        </a>
+          ADD NEW PRODUCT
+        </Link>
       ),
       key: "1",
     },
     {
       label: (
-        <a
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-lg font-semibold text-red-700 hover:text-blue-800"
+        <Link
+          to="/categorics"
+          className="text-md font-bold text-red-700 hover:text-blue-800"
         >
           CATEGORICS
-        </a>
+        </Link>
       ),
       key: "2",
     },
@@ -46,23 +42,18 @@ const Navbar = () => {
   const settingNav = [
     {
       label: (
-        <a
-          target="_blank"
-          rel="noopener noreferrer"
+        <Link
+          to="admin-list"
           className="text-lg font-semibold text-red-700 hover:text-blue-800"
         >
           Users list
-        </a>
+        </Link>
       ),
       key: "0",
     },
     {
       label: (
-        <a
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-lg font-semibold text-red-700 hover:text-red-800"
-        >
+        <a className="text-lg font-semibold text-red-700 hover:text-red-800">
           Add user
         </a>
       ),
@@ -70,11 +61,7 @@ const Navbar = () => {
     },
     {
       label: (
-        <a
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-lg font-semibold text-red-700 hover:text-blue-800"
-        >
+        <a className="text-lg font-semibold text-red-700 hover:text-blue-800">
           App
         </a>
       ),
@@ -82,11 +69,7 @@ const Navbar = () => {
     },
     {
       label: (
-        <a
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-lg font-semibold text-red-700 hover:text-blue-800"
-        >
+        <a className="text-lg font-semibold text-red-700 hover:text-blue-800">
           Zip
         </a>
       ),
@@ -167,18 +150,12 @@ const Navbar = () => {
               >
                 Credits
               </a>
-              <a
-                href="#"
+              <Link
+                to="/customers"
                 className="mt-2 transition-colors duration-300 transform lg:mt-0 lg:mx-4 hover:text-gray-900"
               >
-                Clients
-              </a>
-              <a
-                href="#"
-                className="mt-2 transition-colors duration-300 transform lg:mt-0 lg:mx-4 hover:text-gray-900"
-              >
-                Settings
-              </a>
+                Customers
+              </Link>
               <Dropdown
                 menu={{
                   items: settingNav,
