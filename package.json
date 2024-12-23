@@ -10,10 +10,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "antd": "^5.22.5",
     "@ant-design/icons": "^5.5.2",
     "@tanstack/react-query": "^5.62.8",
+    "antd": "^5.22.5",
     "axios": "^1.7.9",
+    "dayjs": "^1.11.13",
     "localforage": "^1.10.0",
     "match-sorter": "^8.0.0",
     "react": "^18.3.1",

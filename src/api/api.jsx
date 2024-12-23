@@ -3,6 +3,7 @@ import axios from "axios";
 
 export const API = axios.create({
   baseURL: "https://grocary-ecommerce.vercel.app/api/v1",
+  // baseURL: "http://localhost:5000/api/v1",
 });
 
 API.interceptors.request.use((config) => {
@@ -38,4 +39,36 @@ export const useAdminProfile = () => {
 export const signOutAdmin = () => {
   localStorage.removeItem("token");
   window.location.href = "/login";
+};
+
+// get all Orders
+export const useAllOrders = ({
+  page = 1,
+  limit = 15,
+  fromDate,
+  toDate,
+  status,
+} = {}) => {
+  const getOrders = async () => {
+    const response = await API.get("/order/all", {
+      params: { page, limit, fromDate, toDate, status },
+    });
+    return response.data;
+  };
+
+  const {
+    data: response = {},
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["order", page, limit, fromDate, toDate, status],
+    queryFn: getOrders,
+    keepPreviousData: true,
+  });
+
+  const { data: order = [], pagination = {} } = response;
+
+  return { order, pagination, isLoading, isError, error, refetch };
 };

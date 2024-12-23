@@ -4,9 +4,10 @@ import DashBoard from "../pages/DashBoard";
 import Products from "../pages/Products";
 import Login from "../pages/Login";
 import PrivateRoute from "./PrivateRoute";
+import Orders from "../pages/orders/Orders";
+import Test from "../pages/Test";
 
 export const router = createBrowserRouter([
-
   {
     path: "/",
     element: (
@@ -21,8 +22,16 @@ export const router = createBrowserRouter([
       },
       {
         path: "/products",
-        element: <Products />
-      }
+        element: <Products />,
+      },
+      {
+        path: "/orders",
+        element: <Orders />,
+      },
+      {
+        path: "/test",
+        element: <Test />,
+      },
     ],
   },
   {
@@ -30,5 +39,3 @@ export const router = createBrowserRouter([
     element: <Login />,
   },
 ]);
-
-
