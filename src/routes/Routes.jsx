@@ -8,9 +8,10 @@ import AddNewProduct from "../pages/ProductPage/AddNewProduct";
 import Categories from "../pages/ProductPage/Categories";
 import Customers from "../pages/Customers";
 import AdminList from "../pages/SettingsPage/AdminList";
+import Orders from "../pages/orders/Orders";
+import Test from "../pages/Test";
 
 export const router = createBrowserRouter([
-
   {
     path: "/",
     element: (
@@ -25,31 +26,36 @@ export const router = createBrowserRouter([
       },
       {
         path: "/products",
-        element: <Products />
+        element: <Products />,
+      },
+      {
+        path: "/orders",
+        element: <Orders />,
+      },
+      {
+        path: "/test",
+        element: <Test />,
       },
       {
         path: "/addtoproduct",
-        element: <AddNewProduct />
+        element: <AddNewProduct />,
       },
       {
         path: "/categorics",
-        element: <Categories />
+        element: <Categories />,
       },
       {
         path: "/customers",
-        element: <Customers />
+        element: <Customers />,
       },
       {
         path: "/admin-list",
-        element: <AdminList />
-      }
+        element: <AdminList />,
+      },
     ],
   },
   {
     path: "/login",
     element: <Login />,
   },
-  
 ]);
-
-
