@@ -1,263 +1,361 @@
-import { Table, Input, Select, Spin } from "antd";
-import { FaTrashAlt, FaEdit, FaPlus } from "react-icons/fa";
+import React, { useContext, useEffect, useRef, useState } from "react";
+import { Button, Modal, Form, Input, Select, Spin, Table, message } from "antd";
+import { MdDelete } from "react-icons/md";
+import { FaEdit, FaPlus } from "react-icons/fa";
+import "../orders/Orders.css";
+import countries from "../../assets/countries.json";
 import { API, useAllProduct } from "../../api/api";
-import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import Search from "antd/es/transfer/search";
+const EditableContext = React.createContext(null);
 
-const { Option } = Select;
+const EditableRow = ({ index, ...props }) => {
+  const [form] = Form.useForm();
+  return (
+    <Form form={form} component={false}>
+      <EditableContext.Provider value={form}>
+        <tr {...props} />
+      </EditableContext.Provider>
+    </Form>
+  );
+};
+const EditableCell = ({
+  title,
+  editable,
+  children,
+  dataIndex,
+  record,
+  handleSave,
+  ...restProps
+}) => {
+  const [editing, setEditing] = useState(false);
+  const inputRef = useRef(null);
+  const form = useContext(EditableContext);
+  useEffect(() => {
+    if (editing) {
+      inputRef.current?.focus();
+    }
+  }, [editing]);
+  const toggleEdit = () => {
+    setEditing(!editing);
+    form.setFieldsValue({
+      [dataIndex]: record[dataIndex],
+    });
+  };
+  const save = async () => {
+    try {
+      const values = await form.validateFields();
+      toggleEdit();
+      handleSave({
+        ...record,
+        ...values,
+      });
+    } catch (errInfo) {
+      console.log("Save failed:", errInfo);
+    }
+  };
+  let childNode = children;
+  if (editable) {
+    childNode = editing ? (
+      <Form.Item
+        style={{
+          margin: 0,
+        }}
+        name={dataIndex}
+        rules={[
+          {
+            required: true,
+            message: `${title} is required.`,
+          },
+        ]}
+      >
+        <Input ref={inputRef} onPressEnter={save} onBlur={save} />
+      </Form.Item>
+    ) : (
+      <div
+        className="editable-cell-value-wrap"
+        style={{
+          paddingInlineEnd: 24,
+        }}
+        onClick={toggleEdit}
+      >
+        {children}
+      </div>
+    );
+  }
+  return <td {...restProps}>{childNode}</td>;
+};
 
 const Products = () => {
-  const { allProduct, loading, error } = useAllProduct();
-  const [data, setData] = useState([]);
-  const [editedData, setEditedData] = useState([]);
+  const [deletingLoading, setDeletingLoading] = useState(false);
 
-  useEffect(() => {
-    if (allProduct) {
-      const processedData = allProduct.map((item, index) => ({
-        key: index + 1, // Unique key for each row
-        id: item.id, // Adding id to match with the backend
-        ref: item.ref || index + 1,
-        name: item.name || "Unknown Product",
-        purchase_price: item.purchase_price || 0,
-        selling_price: item.selling_price || 0,
-        regular_price: item.regular_price || 0,
-        whole_price: item.whole_price || 0,
-        supper_marcent: item.supper_marcent || 0,
-        product_type: item.product_type || "N/A",
-        unit: item.unit || 0,
-        is_stock: item.is_stock || 0,
-        country: item.country || "Unknown",
-      }));
-      setData(processedData);
-    }
-  }, [allProduct]);
+  const [filters, setFilters] = useState({
+    page: 1,
+    limit: 10,
+  });
 
-  const handleInputChange = async (key, field, value) => {
-    const updatedData = data.map((item) =>
-      item.key === key ? { ...item, [field]: value } : item
-    );
-    setData(updatedData);
+  const { allProduct, pagination, isLoading, isError, error, refetch } =
+    useAllProduct(filters);
 
-    const updatedEditedData = updatedData.filter((item) =>
-      item.key === key
-        ? { ...item, [field]: value }
-        : editedData.find((edited) => edited.key === item.key)
-    );
-    setEditedData(updatedEditedData);
+  const handleTableChange = (pagination, tableFilters) => {
+    const { current: page, pageSize: limit } = pagination;
 
-    console.log("Edited Data:", updatedEditedData);
+    setFilters((prevFilters) => ({
+      ...prevFilters,
+      page,
+      limit,
+    }));
   };
 
-  const columns = [
+  const dataSource = allProduct.map((item) => ({
+    ...item,
+    key: item.id,
+  }));
+
+  const handleStatusChange = async (id, status, value) => {
+    try {
+      const response = await API.put(`/product/update-ucs/${id}`, {
+        [status]: value,
+      });
+
+      if (response.status == 200) {
+        message.success("Product updated successfully");
+        refetch(); // Refresh details after update
+      } else {
+        message.error("Failed to update product");
+      }
+    } catch (error) {
+      message.error(`Error updating product ${error.message}`);
+    }
+  };
+
+  const handleEdit = (value) => {
+    console.log("handleEdit", value);
+  };
+
+  const handleProductDelete = (record) => {
+    Modal.confirm({
+      title: "Are you sure you want to delete this product?",
+      content: `Product Name: ${record.name}`,
+      okText: "Yes, Delete",
+      okType: "danger",
+      cancelText: "Cancel",
+      confirmLoading: deletingLoading, // Add loading state here
+      onOk: async () => {
+        setDeletingLoading(true); // Start loading
+        try {
+          const response = await API.delete(`/product/delete/${record.id}`);
+          if (response.status === 200) {
+            message.success("Product deleted successfully");
+            refetch(); // Refresh product list after deletion
+          } else {
+            message.error("Failed to delete the product");
+          }
+        } catch (error) {
+          message.error(`Error deleting product: ${error.message}`);
+        } finally {
+          setDeletingLoading(false); // Stop loading
+        }
+      },
+      onCancel() {
+        console.log("Delete cancelled");
+      },
+    });
+  };
+
+  const defaultColumns = [
     {
       title: "REF",
-      dataIndex: "ref",
-      key: "ref",
-      align: "center",
-      width: 50,
+      dataIndex: "id",
+      key: "id",
+    },
+
+    {
+      title: "PRODUITS",
+      dataIndex: "name",
+      editable: true,
     },
     {
-      title: "PRODUCTS",
-      dataIndex: "product",
-      key: "product",
-      render: (text, record) => (
-        <Input
-          value={record.name}
-          className="border-gray-300"
-          onChange={(e) =>
-            handleInputChange(record.key, "name", e.target.value)
-          }
-        />
-      ),
-    },
-    {
-      title: "PURCHASE PRICE",
+      title: "PRIX D'ACHAT",
       dataIndex: "purchase_price",
-      key: "purchase_price",
-      render: (text, record) => (
-        <Input
-          value={record.purchase_price}
-          className="border-gray-300"
-          onChange={(e) =>
-            handleInputChange(record.key, "purchase_price", e.target.value)
-          }
-        />
-      ),
+      render: (_, record) => `${record.purchase_price} €`,
+      editable: true,
     },
+
     {
-      title: "PR",
-      dataIndex: "pr",
-      key: "pr",
-      render: (text, record) => (
-        <span className="border px-4 py-2 rounded bg-white">
-          {record.selling_price}
-        </span>
-      ),
-    },
-    {
-      title: "PRS",
-      dataIndex: "prs",
-      key: "prs",
-      render: (text, record) => (
-        <span className="border px-4 py-2 rounded bg-white">
-          {record.regular_price}
-        </span>
-      ),
-    },
-    {
-      title: "PG",
-      dataIndex: "pg",
-      key: "pg",
-      render: (text, record) => (
-        <span className="border px-4 py-2 rounded bg-white">
-          {record.whole_price}
-        </span>
-      ),
-    },
-    {
-      title: "SP",
-      dataIndex: "sp",
-      key: "sp",
-      render: (text, record) => (
-        <span className="border px-4 py-2 rounded bg-white">
-          {record.whole_price}
-        </span>
-      ),
-    },
-    {
-      title: "UNITS",
+      title: "UNITÉS",
       dataIndex: "unit",
       key: "unit",
-      width: 150,
-      render: (text, record) => (
+      width: "5%",
+      render: (_, record) => (
         <Select
-          value={record.unit}
-          className="w-full border-gray-300"
-          onChange={(value) => handleInputChange(record.key, "unit", value)}
-        >
-          <Option value="KG (€ / KG)">KG (€ / KG)</Option>
-          <Option value="G (€ / G)">G (€ / G)</Option>
-          <Option value="MG (€ / MG)">MG (€ / MG)</Option>
-          <Option value="L (€ / L)">L (€ / L)</Option>
-          <Option value="ML (€ / ML)">ML (€ / ML)</Option>
-          <Option value="U (€ / U)">U (€ / U)</Option>
-          <Option value="CM (€ / CM)">CM (€ / CM)</Option>
-          <Option value="MM (€ / MM)">MM (€ / MM)</Option>
-          <Option value="M (€ / M)">M (€ / M)</Option>
-        </Select>
-      ),
-    },
-    {
-      title: "UV",
-      dataIndex: "uv",
-      key: "uv",
-      render: (text, record) => (
-        <Input
-          value={record.supper_marcent}
-          className="border-gray-300"
-          onChange={(e) =>
-            handleInputChange(record.key, "supper_marcent", e.target.value)
-          }
+          value={record?.unit}
+          onChange={(value) => handleStatusChange(record.id, "unit", value)}
+          style={{ width: 125 }}
+          options={[
+            { value: "KG (€ / KG)", label: "KG (€ / KG)" },
+            { value: "G (€ / G)", label: "G (€ / G)" },
+            { value: "MG (€ / MG)", label: "MG (€ / MG)" },
+            { value: "L (€ / L)", label: "L (€ / L)" },
+            { value: "ML (€ / ML)", label: "ML (€ / ML)" },
+            { value: "U (€ / U)", label: "U (€ / U)" },
+            { value: "CM (€ / CM)", label: "CM (€ / CM)" },
+            { value: "MM (€ / MM)", label: "MM (€ / MM)" },
+            { value: "M (€ / M)", label: "M (€ / M)" },
+          ]}
         />
       ),
+    },
+
+    {
+      title: "UV",
+      dataIndex: "supper_marcent",
+      render: (_, record) => `${record.supper_marcent} €`,
+      editable: true,
     },
     {
       title: "STOCK",
-      dataIndex: "stock",
-      key: "stock",
-      render: (text, record) => (
-        <Input
-          value={record.is_stock}
-          className="border-gray-300"
-          onChange={(e) =>
-            handleInputChange(record.key, "is_stock", e.target.value)
-          }
+      dataIndex: "is_stock",
+      render: (_, record) => (
+        <Select
+          value={record?.is_stock == 1 ? "In Stock" : "Out of Stock"}
+          style={{ width: 100 }}
+          onChange={(value) => handleStatusChange(record.id, "is_stock", value)}
+          options={[
+            { value: true, label: "In Stock" },
+            { value: false, label: "Out of Stock" },
+          ]}
+        />
+      ),
+    },
+
+    {
+      title: "ORIGINE",
+      dataIndex: "country",
+      key: "country",
+      render: (_, record) => (
+        <Select
+          showSearch
+          placeholder="Select a Country"
+          optionFilterProp="label"
+          value={record?.country}
+          onChange={(value) => handleStatusChange(record.id, "country", value)}
+          style={{ width: 180 }}
+          options={countries.map((country) => ({
+            value: country.name,
+            label: country.name,
+          }))}
         />
       ),
     },
     {
-      title: "ORIGIN",
-      dataIndex: "origin",
-      key: "origin",
-      render: (text, record) => (
+      title: "STATUT",
+      dataIndex: "status",
+      key: "status",
+      render: (_, record) => (
         <Select
-          value={record.country}
-          className="w-full border-gray-300"
-          onChange={(value) => handleInputChange(record.key, "country", value)}
-        >
-          <Option value="Bangladesh">Bangladesh</Option>
-          <Option value="Belgique">Belgique</Option>
-          <Option value="Espagne">Espagne</Option>
-        </Select>
+          value={record?.status}
+          style={{ width: 100 }}
+          onChange={(value) => handleStatusChange(record.id, "status", value)}
+          options={[
+            { value: "active", label: "active" },
+            { value: "inactive", label: "inactive" },
+          ]}
+        />
       ),
     },
+
     {
-      title: "Action",
-      dataIndex: "action",
-      key: "action",
-      align: "center",
-      render: () => (
-        <div className="flex gap-2 justify-center">
-          <FaEdit className="text-yellow-600 cursor-pointer hover:text-yellow-800" />
-          <FaTrashAlt className="text-red-600 cursor-pointer hover:text-red-800" />
+      title: "ACTIONS",
+      dataIndex: "operation",
+
+      render: (_, record) => (
+        <div className="flex gap-3 text-xl">
+          <FaEdit
+            className="cursor-pointer"
+            onClick={() => handleEdit(record)}
+          />
+          <MdDelete
+            className="cursor-pointer"
+            onClick={() => handleProductDelete(record)}
+          />
         </div>
       ),
     },
   ];
 
-  const contentStyle = {
-    padding: 50,
-    background: "rgba(0, 0, 0, 0.05)",
-    borderRadius: 4,
+  const handleSave = async (row) => {
+    const id = row?.id;
+    try {
+      const response = await API.put(`/product/update/${id}`, row);
+      if (response.status === 200) {
+        message.success(`${row.name} updated successfully!`);
+      }
+
+      refetch();
+    } catch (error) {
+      message.error(`Failed to add ${row.name}. Try again.`);
+      console.log("error", error);
+    }
   };
-  const content = <div style={contentStyle} />;
-  // loading
-  if (loading)
+  const components = {
+    body: {
+      row: EditableRow,
+      cell: EditableCell,
+    },
+  };
+  const columns = defaultColumns.map((col) => {
+    if (!col.editable) {
+      return col;
+    }
+    return {
+      ...col,
+      onCell: (record) => ({
+        record,
+        editable: col.editable,
+        dataIndex: col.dataIndex,
+        title: col.title,
+        handleSave,
+      }),
+    };
+  });
+
+  if (isLoading) return <Spin size="large" className="block mx-auto my-10" />;
+  if (isError)
     return (
-      <Spin tip="Loading" size="large">
-        {content}
-      </Spin>
+      <div className="text-center text-red-500">
+        {error.message || "Something went wrong"}
+      </div>
     );
-  if (error) return <div>Error loading products</div>;
-  // search funsion
-  const onSearch = (value, _e, info) => console.log(info?.source, value);
 
   return (
-    <div className="p-4 bg-gray-100 min-h-screen">
-      <div className="flex justify-between">
-        <div className="flex gap-3">
-          <h1 className="text-2xl font-bold mb-6 text-gray-800">
-            Product Table
-          </h1>
-          <Link to="/addtoproduct">
-            <button className="bg-[#e24c80] p-3 text-white font-semibold rounded-md flex items-center gap-1">
-             <FaPlus/> Add New Product
-            </button>
-          </Link>
+    <div className="mx-24 my-5 border-shadow">
+      <div className="flex justify-between mx-6 mb-5">
+        <div className="text-3xl font-bold text-[#e24c80]">
+          Liste des Produits
         </div>
-        <div>
-          <Search
-            placeholder="Search by Order ID"
-            allowClear
-            enterButton="Search"
-            size="large"
-            onSearch={onSearch}
-          />
-        </div>
+        <Link to="/addtoproduct">
+          <button className="bg-[#e24c80] p-3 text-white font-semibold rounded-md flex items-center gap-1">
+            <FaPlus /> Add New Product
+          </button>
+        </Link>
       </div>
 
-      <Table
-        columns={columns}
-        dataSource={data}
-        bordered
-        pagination={{ pageSize: 10 }}
-        rowClassName={(record, index) =>
-          index % 2 === 0 ? "bg-white" : "bg-gray-200"
-        }
-      />
+      <div className="mx-6">
+        <Table
+          components={components}
+          rowClassName={() => "editable-row"}
+          bordered
+          dataSource={dataSource}
+          pagination={{
+            current: filters.page,
+            pageSize: filters.limit,
+            total: pagination.totalProducts,
+          }}
+          onChange={handleTableChange}
+          columns={columns}
+        />
+      </div>
     </div>
   );
 };
-
 export default Products;
