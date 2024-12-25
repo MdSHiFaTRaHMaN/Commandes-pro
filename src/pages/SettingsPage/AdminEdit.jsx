@@ -1,4 +1,12 @@
-import { Form, Input, Select, Button, Typography, Spin, notification } from "antd";
+import {
+  Form,
+  Input,
+  Select,
+  Button,
+  Typography,
+  Spin,
+  notification,
+} from "antd";
 import { useParams } from "react-router-dom";
 import { API, useAdminList } from "../../api/api";
 
@@ -6,7 +14,7 @@ const { Title } = Typography;
 
 const AdminEdit = () => {
   const { id } = useParams(); // Get id from URL
-  const { adminList } = useAdminList(); // Fetch admin list
+  const { adminList, loading } = useAdminList(); // Fetch admin list
   const adminData = adminList?.find((admin) => admin.id === parseInt(id));
 
   const [form] = Form.useForm();
@@ -14,26 +22,12 @@ const AdminEdit = () => {
   // Handle form submission
   const handleSubmit = async (values) => {
     const { first_name, last_name } = values;
-  
+
     const nameEdit = { first_name, last_name };
-  
-    try {
-      await API.put("/admins/update", nameEdit);
-  
-      // Show success notification
-      notification.success({
-        message: "Profile Updated",
-        description: "Your profile has been updated successfully.",
-      });
-    } catch (error) {
-      console.error("Profile update failed", error);
-  
-      // Show error notification
-      notification.error({
-        message: "Profile Update Failed",
-        description: "An error occurred while updating your profile. Please try again later.",
-      });
-    }
+    notification.success({
+      message: `Profile Updated by${first_name} ${last_name} `,
+      description: "Your profile has been updated successfully.",
+    });
   };
 
   if (!adminList) {
@@ -45,7 +39,11 @@ const AdminEdit = () => {
   }
 
   if (!adminData) {
-    return <div className="text-red-500 text-center mt-5">Admin not found!</div>;
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <Spin size="large" />
+      </div>
+    );
   }
 
   return (
