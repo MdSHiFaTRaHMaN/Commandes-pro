@@ -1,20 +1,30 @@
-import { Input, Select, Button, Upload, message } from "antd";
+import React, { useEffect, useState } from "react";
+
+import { Input, Select, Button, Upload, message, Spin } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import { AiOutlineSave } from "react-icons/ai";
 import { FaArrowLeftLong } from "react-icons/fa6";
-import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
-import { API, useCategory, useSubCategory } from "../../api/api";
-import { RiDeleteBinFill } from "react-icons/ri";
+import { useNavigate, useParams } from "react-router-dom";
 import country from "../../assets/countries.json";
+import {
+  API,
+  useCategory,
+  useSingleProduct,
+  useSubCategory,
+} from "../../api/api";
+import { RiDeleteBinFill } from "react-icons/ri";
 import axios from "axios";
 
 const { TextArea } = Input;
 const { Option } = Select;
 
-const AddNewProduct = () => {
+const EditProduct = () => {
+  const { productID } = useParams();
+  const { singleProduct, isLoading, isError, error, refetch } =
+    useSingleProduct(productID);
+
   const { category } = useCategory();
-  const [selectCategoryID, setSelectCategoryID] = useState(0);
+  const [selectCategoryID, setSelectCategoryID] = useState();
   const { subCategory } = useSubCategory(selectCategoryID);
   const navigate = useNavigate();
   const [fileList, setFileList] = useState([]);
@@ -28,16 +38,55 @@ const AddNewProduct = () => {
   const [prixSupermarché, setPrixSupermarché] = useState();
 
   const [packaging, setPackaging] = useState("");
-  const [productUnit, setProductUnit] = useState("");
+  const [productUnit, setProductUnit] = useState();
   const [origin, setOrigin] = useState("");
-  const [vat, setVat] = useState("");
+  const [vat, setVat] = useState();
 
   const [inStock, setInStock] = useState(0);
-  const [productName, setProductName] = useState("");
-  const [productDescription, setProductDescription] = useState("");
+  const [productName, setProductName] = useState();
+  const [productDescription, setProductDescription] = useState();
   const [weigthVolumeUnit, setWeigthVolumeUnit] = useState(0);
   const [inDiscount, setInDiscount] = useState(0);
   const [productUploading, setProductUploading] = useState(false);
+
+  useEffect(() => {
+    if (singleProduct) {
+      setProductName(singleProduct.name);
+      setSelectCategoryID(singleProduct.category_id);
+      setProductUnit(singleProduct.unit);
+      setProductDescription(singleProduct.long_description);
+      setVat(singleProduct.tax);
+      setOrigin(singleProduct.country);
+      setPurchasePrice(singleProduct.purchase_price);
+      setResellerPrice(singleProduct.regular_price);
+      setPrixRestaurants(singleProduct.selling_price);
+      setPrixGrossistes(singleProduct.whole_price);
+      setInDiscount(singleProduct.discount_price);
+      setPrixSupermarché(singleProduct.supper_marcent);
+
+      if (singleProduct && singleProduct.images?.length > 0) {
+        const defaultImages = singleProduct?.images?.map((image, index) => ({
+          uid: `-${index}`,
+          name: `image-${index}.png`,
+          status: "done",
+          url: image.image_url,
+        }));
+        setFileList(defaultImages);
+      }
+
+      if (singleProduct && singleProduct.subcategories) {
+        const defaultSubCategories = singleProduct.subcategories.map(
+          (subCatry) => subCatry.subCategory_name
+        );
+        const defaultSubCategoriesId = singleProduct.subcategories.map(
+          (subCatry) => subCatry.subCategory_id
+        );
+
+        setSelectedSubCategories(defaultSubCategories);
+        setSelectedSubCategoriesId(defaultSubCategoriesId);
+      }
+    }
+  }, [singleProduct]);
 
   const handlePurchasePriceChange = (e) => {
     const price = parseFloat(e.target.value) || 0;
@@ -52,21 +101,31 @@ const AddNewProduct = () => {
   const handleCategorySelect = (value) => {
     setSelectCategoryID(value);
   };
-  //  sub category add funsion
+
   const handleSelect = (selected) => {
     const { id, name } = selected;
 
-    // Avoid adding duplicates
-    if (!selectedSubCategories.includes(name)) {
-      setSelectedSubCategories([...selectedSubCategories, name]);
-      setSelectedSubCategoriesId([...selectedSubCategoriesId, id]);
+    if (selected && selected.name) {
+      // Avoid adding duplicate names
+      setSelectedSubCategories((prev) =>
+        prev.includes(name) ? prev : [...prev, name]
+      );
+    }
+
+    if (!selectedSubCategoriesId.includes(id)) {
+      // Avoid adding duplicate IDs
+      setSelectedSubCategoriesId((prev) => [...prev, id]);
     }
   };
 
-  const handleDelete = (subCategory) => {
-    // Remove the selected subcategory
-    setSelectedSubCategories(
-      selectedSubCategories.filter((sub) => sub !== subCategory)
+  const handleDelete = (subCategoryName) => {
+    setSelectedSubCategories((prev) =>
+      prev.filter((sub) => sub !== subCategoryName)
+    );
+    setSelectedSubCategoriesId((prev) =>
+      prev.filter(
+        (id, index) => selectedSubCategories[index] !== subCategoryName
+      )
     );
   };
 
@@ -74,6 +133,10 @@ const AddNewProduct = () => {
   const handleImageUpload = async ({ fileList: newFileList }) => {
     setFileList(newFileList);
   };
+  //   const handleImageUpload = ({ fileList: updatedFileList }) => {
+  //     setFileList(updatedFileList);
+  // };
+
   const handlePreview = async (file) => {
     let src = file.url;
     if (!src) {
@@ -95,9 +158,20 @@ const AddNewProduct = () => {
   const handleSaveProudct = async () => {
     try {
       const formData = new FormData();
-      fileList.forEach((file) => {
-        formData.append("pdfs", file.originFileObj);
-      });
+      await Promise.all(
+        fileList.map(async (file) => {
+          let fileToUpload = file.originFileObj;
+          if (!fileToUpload && file.url) {
+            // Fetch image from URL if it's not already a file
+            const response = await fetch(file.url);
+            const blob = await response.blob();
+            fileToUpload = new File([blob], file.name || "image.jpg", {
+              type: blob.type,
+            });
+          }
+          formData.append("pdfs", fileToUpload);
+        })
+      );
 
       // Make a single POST request
       const response = await axios.post(
@@ -134,11 +208,13 @@ const AddNewProduct = () => {
 
       try {
         setProductUploading(true);
-        const response = await API.post("/product/create", productData);
+        const response = await API.put(
+          `/product/update/${productID}`,
+          productData
+        );
         if (response.status == 200) {
           message.success("Product Added Successfully");
         }
-        console.log(response, "resposne");
         setProductUploading(false);
       } catch (error) {
         console.error(error);
@@ -151,6 +227,14 @@ const AddNewProduct = () => {
     }
   };
 
+  if (isLoading) return <Spin size="large" className="block mx-auto my-10" />;
+  if (isError)
+    return (
+      <div className="text-center text-red-500">
+        {error.message || "Something went wrong"}
+      </div>
+    );
+
   return (
     <div className="p-6 min-h-screen bg-gray-50">
       <div className="w-11/12 mx-auto bg-white p-8 shadow rounded-md">
@@ -161,7 +245,7 @@ const AddNewProduct = () => {
           >
             <FaArrowLeftLong />
           </button>
-          Add Product
+          Edit Product
         </h2>
 
         <div className="flex gap-6">
@@ -232,6 +316,7 @@ const AddNewProduct = () => {
                 <Select
                   placeholder="Product Unit"
                   className="w-full h-12"
+                  value={singleProduct.unit}
                   onChange={(value) => setProductUnit(value)}
                 >
                   <Option value="KG (€ / KG)">KG (€ / KG)</Option>
@@ -261,6 +346,7 @@ const AddNewProduct = () => {
                   className="w-full h-12"
                   onSearch={onSearch}
                   showSearch
+                  value={singleProduct.country}
                   onChange={(value) => setOrigin(value)}
                 >
                   {country.map((countrys, index) => (
@@ -275,6 +361,7 @@ const AddNewProduct = () => {
                 <Select
                   placeholder="Select VAT%"
                   className="w-full h-12"
+                  value={singleProduct.tax}
                   onChange={(value) => setVat(value)}
                 >
                   <Option value="0">0</Option>
@@ -382,6 +469,7 @@ const AddNewProduct = () => {
                 placeholder="Discount (%)"
                 type="number"
                 className="py-3"
+                value={inDiscount}
                 onChange={(e) => setInDiscount(Number(e.target.value))}
               />
             </div>
@@ -394,6 +482,11 @@ const AddNewProduct = () => {
                 <Select
                   placeholder="LÉGUMES"
                   className="w-full h-12"
+                  value={
+                    category.find(
+                      (ctry) => ctry.id == singleProduct.category_id
+                    )?.category_name
+                  }
                   onChange={handleCategorySelect}
                 >
                   {category.map((ctry) => (
@@ -403,8 +496,10 @@ const AddNewProduct = () => {
                   ))}
                 </Select>
               </div>
+
               <div>
                 <label className="block text-gray-700 mb-1">Sub Category</label>
+
                 <Select
                   placeholder="Select Main Sub Categories"
                   className="w-full h-12"
@@ -423,9 +518,9 @@ const AddNewProduct = () => {
             </div>
             <div className="mt-4">
               <div className="mt-2">
-                {selectedSubCategories.map((sub) => (
+                {selectedSubCategories.map((sub, index) => (
                   <div
-                    key={sub}
+                    key={index}
                     className="flex items-center justify-between bg-gray-200 p-2 rounded mb-2"
                   >
                     <span>{sub}</span>
@@ -460,4 +555,4 @@ const AddNewProduct = () => {
   );
 };
 
-export default AddNewProduct;
+export default EditProduct;

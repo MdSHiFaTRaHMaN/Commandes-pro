@@ -12,6 +12,8 @@ import Orders from "../pages/orders/Orders";
 import Test from "../pages/Test";
 import AdminEdit from "../pages/SettingsPage/AdminEdit";
 import AdminProfile from "../pages/AdminProfile";
+import EditProduct from "../pages/ProductPage/EditProduct";
+import InvoiceOrder from "../pages/orders/InvoiceOrder";
 
 export const router = createBrowserRouter([
   {
@@ -29,6 +31,10 @@ export const router = createBrowserRouter([
       {
         path: "/products",
         element: <Products />,
+      },
+      {
+        path: "/products/edit/:productID",
+        element: <EditProduct />,
       },
       {
         path: "/orders",
@@ -56,12 +62,16 @@ export const router = createBrowserRouter([
       },
       {
         path: "/admin-edit/:id",
-        element: <AdminEdit />
+        element: <AdminEdit />,
       },
       {
         path: "/admin-profile",
-        element: <AdminProfile />
-      }
+        element: <AdminProfile />,
+      },
+      {
+        path: "/order/:orderId",
+        element: <InvoiceOrder />,
+      },
     ],
   },
   {

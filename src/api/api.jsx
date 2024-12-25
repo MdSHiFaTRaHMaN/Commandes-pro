@@ -100,6 +100,27 @@ export const useAllProduct = ({ page = 1, limit = 10 } = {}) => {
   return { allProduct, pagination, isLoading, isError, error, refetch };
 };
 
+// get single product
+export const useSingleProduct = (productID) => {
+  const getSingleProduct = async () => {
+    const response = await API.get(`/product/${productID}`);
+    return response.data.data;
+  };
+
+  const {
+    data: singleProduct = [],
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["singleProduct", productID],
+    queryFn: getSingleProduct,
+  });
+
+  return { singleProduct, isLoading, isError, error, refetch };
+};
+
 // All user show
 export const useAllCustomers = () => {
   const getCustomer = async () => {
@@ -168,39 +189,6 @@ export const useAdminList = () => {
   return { adminList, loading, error };
 };
 
-export const useAllSubCategory = () => {
-  const getSubCategory = async () => {
-    try {
-      const response = await API.get("/category");
-      return response.data.data;
-    } catch (error) {
-      console.error("Error fetching SubCategory:", error);
-      throw error;
-    }
-  };
-
-  const [subCategoryList, setSubCategoryList] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    const fetchAllSubCategory = async () => {
-      try {
-        const categoryData = await getSubCategory();
-        setSubCategoryList(categoryData);
-      } catch (error) {
-        setError("Failed to fetch all Category.", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAllSubCategory();
-  }, []);
-
-  return { subCategoryList, loading, error };
-};
-
 // get category
 export const useCategory = () => {
   const getCategory = async () => {
@@ -241,4 +229,26 @@ export const useSubCategory = (categoryId) => {
   });
 
   return { subCategory, isLoading, isError, error, refetch };
+};
+// get single order
+
+export const useSingleOrder = (orderId) => {
+  const getSingleOrder = async () => {
+    console.log(orderId);
+    const response = await API.get(`/order/${orderId}`);
+    return response.data.order;
+  };
+
+  const {
+    data: singleOrder = [],
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["singleOrder", orderId],
+    queryFn: getSingleOrder,
+  });
+
+  return { singleOrder, isLoading, isError, error, refetch };
 };

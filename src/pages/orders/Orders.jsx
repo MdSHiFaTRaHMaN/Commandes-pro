@@ -15,6 +15,7 @@ import { FaEdit } from "react-icons/fa";
 import { IoPrint } from "react-icons/io5";
 import "./Orders.css";
 import { API, useAllOrders } from "../../api/api";
+import { Link } from "react-router-dom";
 const EditableContext = React.createContext(null);
 const EditableRow = ({ index, ...props }) => {
   const [form] = Form.useForm();
@@ -215,10 +216,13 @@ const Orders = () => {
 
       render: (_, record) => (
         <div className="flex gap-3 text-xl">
-          <IoPrint
-            className="cursor-pointer"
-            onClick={() => handlePrint(record)}
-          />
+          <Link to={`/order/${record.id}`}>
+            <IoPrint
+              className="cursor-pointer"
+              onClick={() => handlePrint(record)}
+            />
+          </Link>
+
           <FaEdit
             className="cursor-pointer"
             onClick={() => handleEdit(record)}

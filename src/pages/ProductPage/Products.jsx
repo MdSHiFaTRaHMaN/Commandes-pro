@@ -128,10 +128,6 @@ const Products = () => {
     }
   };
 
-  const handleEdit = (value) => {
-    console.log("handleEdit", value);
-  };
-
   const handleProductDelete = (record) => {
     Modal.confirm({
       title: "Are you sure you want to delete this product?",
@@ -270,10 +266,13 @@ const Products = () => {
 
       render: (_, record) => (
         <div className="flex gap-3 text-xl">
-          <FaEdit
-            className="cursor-pointer"
-            onClick={() => handleEdit(record)}
-          />
+          <Link to={`/products/edit/${record.id}`}>
+            <FaEdit
+              className="cursor-pointer"
+              onClick={() => handleEdit(record)}
+            />
+          </Link>
+
           <MdDelete
             className="cursor-pointer"
             onClick={() => handleProductDelete(record)}
