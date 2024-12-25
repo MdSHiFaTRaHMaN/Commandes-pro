@@ -4,6 +4,8 @@ import { Button, Input, Space, Table } from "antd";
 import Highlighter from "react-highlight-words";
 import { useAdminList } from "../../api/api";
 import { FaEdit } from "react-icons/fa";
+import { RiDeleteBin6Line } from "react-icons/ri";
+import { Link } from "react-router-dom";
 
 const AdminList = () => {
   const [searchText, setSearchText] = useState("");
@@ -129,9 +131,9 @@ const AdminList = () => {
 
   const columns = [
     {
-        title: "Id",
-        dataIndex: "id",
-        key: "id",
+      title: "Id",
+      dataIndex: "id",
+      key: "id",
     },
     {
       title: "Name",
@@ -149,6 +151,7 @@ const AdminList = () => {
       title: "Email",
       dataIndex: "email",
       key: "email",
+      ...getColumnSearchProps("email"),
     },
     {
       title: "Role",
@@ -166,11 +169,17 @@ const AdminList = () => {
       title: "Action",
       key: "action",
       render: (_, record) => (
-        <Space size="middle">
-          <Button type="link"><FaEdit /></Button>
-          <Button type="link" danger>
-            Delete
-          </Button>
+        <Space className="flex justify-center">
+          <Link to={`/admin-edit/${record.id}`}>
+            <Button className="text-green-600 text-xl">
+              <FaEdit />
+            </Button>
+          </Link>
+          <Link>
+            <Button type="link" className="text-red-700 text-xl" danger>
+              <RiDeleteBin6Line />
+            </Button>
+          </Link>
         </Space>
       ),
     },

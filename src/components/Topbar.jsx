@@ -3,6 +3,7 @@ import logo from "../assets/images/LOGO-COMMANDES-PRO.png";
 import { FaRegUserCircle } from "react-icons/fa";
 import { signOutAdmin, useAdminProfile } from "../api/api";
 import { Button } from "antd";
+import { Link } from "react-router-dom";
 
 function Topbar() {
   const { admin, isLoading, isError, error } = useAdminProfile();
@@ -17,7 +18,7 @@ function Topbar() {
       <div>
         <div className="flex text-2xl my-6">
           <FaRegUserCircle />
-          <div className="mt-[-4px] mx-1"> Hi, ({admin?.role_name})</div>
+          <Link to="/admin-profile"><div className="mt-[-4px] mx-1"> Hi, ({admin?.role_name})</div></Link>
           <Button type="primary" danger onClick={handleSignOut}>
             Log Out
           </Button>

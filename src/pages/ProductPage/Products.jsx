@@ -112,7 +112,6 @@ const Products = () => {
   }));
 
   const handleStatusChange = async (id, status, value) => {
-    console.log(value);
     try {
       const response = await API.put(`/product/update-ucs/${id}`, {
         [status]: value,
