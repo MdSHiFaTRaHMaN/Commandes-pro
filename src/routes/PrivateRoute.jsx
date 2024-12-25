@@ -6,6 +6,8 @@ import { useAdminProfile } from "../api/api";
 const PrivateRoute = ({ children }) => {
   const { admin, isLoading, isError, error } = useAdminProfile();
 
+  console.log(admin, "admin")
+
   const location = useLocation();
   const token = localStorage.getItem("token");
 

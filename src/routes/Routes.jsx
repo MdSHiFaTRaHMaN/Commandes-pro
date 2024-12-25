@@ -10,6 +10,8 @@ import Customers from "../pages/Customers";
 import AdminList from "../pages/SettingsPage/AdminList";
 import Orders from "../pages/orders/Orders";
 import Test from "../pages/Test";
+import AdminEdit from "../pages/SettingsPage/AdminEdit";
+import AdminProfile from "../pages/AdminProfile";
 
 export const router = createBrowserRouter([
   {
@@ -52,6 +54,14 @@ export const router = createBrowserRouter([
         path: "/admin-list",
         element: <AdminList />,
       },
+      {
+        path: "/admin-edit/:id",
+        element: <AdminEdit />
+      },
+      {
+        path: "/admin-profile",
+        element: <AdminProfile />
+      }
     ],
   },
   {
