@@ -75,41 +75,29 @@ export const useAllOrders = ({
 };
 
 // Products list
-
-// food menu
-export const useAllProduct = () => {
-  const getProduct = async () => {
-    try {
-      const response = await API.get(
-        "/product/all?category=&name=&subcategory=&tag="
-      );
-      return response.data.data;
-    } catch (error) {
-      console.error("Error fetching All product:", error);
-      throw error;
-    }
+export const useAllProduct = ({ page = 1, limit = 10 } = {}) => {
+  const getAllProduct = async () => {
+    const response = await API.get("/product/all", {
+      params: { page, limit },
+    });
+    return response.data;
   };
 
-  const [allProduct, setAllProduct] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const {
+    data: response = {},
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["allProduct", page, limit],
+    queryFn: getAllProduct,
+    keepPreviousData: true,
+  });
 
-  useEffect(() => {
-    const fetchAllProduct = async () => {
-      try {
-        const menuData = await getProduct();
-        setAllProduct(menuData);
-      } catch (error) {
-        setError("Failed to fetch all product.", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const { data: allProduct = [], pagination = {} } = response;
 
-    fetchAllProduct();
-  }, []);
-
-  return { allProduct, loading, error };
+  return { allProduct, pagination, isLoading, isError, error, refetch };
 };
 
 // All user show
