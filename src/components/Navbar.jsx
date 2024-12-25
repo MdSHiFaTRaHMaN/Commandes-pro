@@ -53,9 +53,9 @@ const Navbar = () => {
     },
     {
       label: (
-        <a className="text-lg font-semibold text-red-700 hover:text-red-800">
-          Add user
-        </a>
+        <Link to="/add-new-user" className="text-lg font-semibold text-red-700 hover:text-red-800">
+          Add New User
+        </Link>
       ),
       key: "1",
     },

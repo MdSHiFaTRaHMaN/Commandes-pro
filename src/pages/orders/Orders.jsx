@@ -11,10 +11,11 @@ import {
 } from "antd";
 import dayjs from "dayjs";
 const dateFormat = "YYYY-MM-DD";
-import { FaEdit } from "react-icons/fa";
+import { FaEdit, FaPlus } from "react-icons/fa";
 import { IoPrint } from "react-icons/io5";
 import "./Orders.css";
 import { API, useAllOrders } from "../../api/api";
+import { Link } from "react-router-dom";
 const EditableContext = React.createContext(null);
 const EditableRow = ({ index, ...props }) => {
   const [form] = Form.useForm();
@@ -294,7 +295,11 @@ const Orders = () => {
         <div className="text-3xl font-bold text-[#e24c80]">
           Liste des commandes
         </div>
-        {/* <div>All Orders</div> */}
+        <Link to="/add-order">
+          <button className="bg-PrimaryColor p-3 text-white rounded flex items-center gap-1">
+            <FaPlus /> Add Order
+          </button>
+        </Link>
       </div>
 
       <div className="mx-6">

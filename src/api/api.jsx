@@ -3,8 +3,8 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 
 export const API = axios.create({
-  baseURL: "https://grocary-ecommerce.vercel.app/api/v1",
-  // baseURL: "http://localhost:5000/api/v1",
+  // baseURL: "https://grocary-ecommerce.vercel.app/api/v1",
+  baseURL: "http://localhost:5000/api/v1",
 });
 
 API.interceptors.request.use((config) => {
@@ -168,38 +168,6 @@ export const useAdminList = () => {
   return { adminList, loading, error };
 };
 
-export const useAllSubCategory = () => {
-  const getSubCategory = async () => {
-    try {
-      const response = await API.get("/category");
-      return response.data.data;
-    } catch (error) {
-      console.error("Error fetching SubCategory:", error);
-      throw error;
-    }
-  };
-
-  const [subCategoryList, setSubCategoryList] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    const fetchAllSubCategory = async () => {
-      try {
-        const categoryData = await getSubCategory();
-        setSubCategoryList(categoryData);
-      } catch (error) {
-        setError("Failed to fetch all Category.", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAllSubCategory();
-  }, []);
-
-  return { subCategoryList, loading, error };
-};
 
 // get category
 export const useCategory = () => {
@@ -241,4 +209,87 @@ export const useSubCategory = (categoryId) => {
   });
 
   return { subCategory, isLoading, isError, error, refetch };
+};
+// get user roll
+export const useUserRole = () => {
+  const getUserRole = async () => {
+    const response = await API.get("/admins/role");
+    return response.data.data;
+  };
+
+  const {
+    data: userRole = [],
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["UserRole"],
+    queryFn: getUserRole,
+  });
+
+  return { userRole, isLoading, isError, error, refetch };
+};
+// get user role with permition
+export const useRolePermission = () => {
+  const getRolePermission = async () => {
+    const response = await API.get(`/admins/role/2`);
+    console.log(response)
+    return response.data.data;
+  };
+
+  const {
+    data: rolePermission = [],
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["rolePermission"],
+    queryFn: getRolePermission,
+  });
+
+  return { rolePermission, isLoading, isError, error, refetch };
+};
+
+// get customer address
+export const useCustomerAddress = (selectedCustomer) => {
+  const getCustomerAddress = async () => {
+    const response = await API.get(`/delivery-addresss/${selectedCustomer}`);
+    return response.data.data;
+  };
+
+  const {
+    data: customerAddress = [],
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["customerAddress", selectedCustomer],
+    queryFn: getCustomerAddress,
+  });
+
+  return { customerAddress, isLoading, isError, error, refetch };
+};
+
+// get product name
+export const useProductName = () => {
+  const getProduct = async () => {
+    const response = await API.get("/product");
+    return response.data.data;
+  };
+
+  const {
+    data: product = [],
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["product", ],
+    queryFn: getProduct,
+  });
+
+  return { product, isLoading, isError, error, refetch };
 };

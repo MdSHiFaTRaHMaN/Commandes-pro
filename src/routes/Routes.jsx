@@ -12,6 +12,8 @@ import Orders from "../pages/orders/Orders";
 import Test from "../pages/Test";
 import AdminEdit from "../pages/SettingsPage/AdminEdit";
 import AdminProfile from "../pages/AdminProfile";
+import AddNewUser from "../pages/SettingsPage/AddNewUser";
+import AddOrder from "../pages/orders/AddOrder";
 
 export const router = createBrowserRouter([
   {
@@ -61,6 +63,14 @@ export const router = createBrowserRouter([
       {
         path: "/admin-profile",
         element: <AdminProfile />
+      },
+      {
+        path: "/add-new-user",
+        element: <AddNewUser />
+      },
+      {
+        path: "/add-order",
+        element: <AddOrder />
       }
     ],
   },
