@@ -16,6 +16,12 @@ import EditProduct from "../pages/ProductPage/EditProduct";
 import InvoiceOrder from "../pages/orders/InvoiceOrder";
 import AddNewUser from "../pages/SettingsPage/AddNewUser";
 import AddOrder from "../pages/orders/AddOrder";
+import EditOrder from "../pages/orders/EditOrder";
+
+import PostalCode from "../pages/SettingsPage/PostalCode";
+import AddClient from "../pages/AddClient";
+import OrderInvoice from "../pages/orders/OrderInvoice";
+import MultiOrderInvoice from "../pages/orders/MultiOrderInvoice";
 
 export const router = createBrowserRouter([
   {
@@ -41,6 +47,10 @@ export const router = createBrowserRouter([
       {
         path: "/orders",
         element: <Orders />,
+      },
+      {
+        path: "/orders/edit/:orderId",
+        element: <EditOrder />,
       },
       {
         path: "/test",
@@ -78,6 +88,22 @@ export const router = createBrowserRouter([
         path: "/add-order",
         element: <AddOrder />,
       },
+      {
+        path: "/postal-code",
+        element: <PostalCode />
+      },
+      {
+        path: "/add-customer",
+        element: <AddClient />
+      },
+      {
+        path: "/order-invoice/:orderId",
+        element: <OrderInvoice />
+      },
+      {
+        path: "/multi-invoice",
+        element: <MultiOrderInvoice />
+      }
     ],
   },
   {

@@ -1,6 +1,6 @@
 import React from "react";
 import { Input, Select, Button, Typography } from "antd";
-import { useRolePermission, useUserRole } from "../../api/api";
+import {  useUserRole } from "../../api/api";
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -8,7 +8,6 @@ const { Option } = Select;
 const AddNewUser = () => {
   const { userRole } = useUserRole();
 
-  const {rolePermission} = useRolePermission();
   
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100">

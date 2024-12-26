@@ -119,8 +119,9 @@ const AddNewProduct = () => {
         tax: vat || 0,
         country: origin || "",
         purchase_price: purchasePrice || 0,
-        regular_price: resellerPrice || 0,
-        selling_price: prixRestaurants || 0,
+        regular_price: prixRestaurants || 0,
+        selling_price: resellerPrice || 0,
+
         whole_price: prixGrossistes || 0,
         discount_price: inDiscount || 0,
         supper_marcent: prixSupermarché || 0,
