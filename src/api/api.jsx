@@ -242,3 +242,188 @@ export const useSubCategory = (categoryId) => {
 
   return { subCategory, isLoading, isError, error, refetch };
 };
+// get user roll
+export const useUserRole = () => {
+  const getUserRole = async () => {
+    const response = await API.get("/admins/role");
+    return response.data.data;
+  };
+
+  const {
+    data: userRole = [],
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["UserRole"],
+    queryFn: getUserRole,
+  });
+
+  return { userRole, isLoading, isError, error, refetch };
+};
+// get user role with permition
+export const useRolePermission = () => {
+  const getRolePermission = async () => {
+    const response = await API.get(`/admins/role/2`);
+    console.log(response);
+    return response.data.data;
+  };
+
+  const {
+    data: rolePermission = [],
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["rolePermission"],
+    queryFn: getRolePermission,
+  });
+
+  return { rolePermission, isLoading, isError, error, refetch };
+};
+
+// get customer address
+export const useCustomerAddress = (selectedCustomer) => {
+  const getCustomerAddress = async () => {
+    const response = await API.get(`/delivery-addresss/${selectedCustomer}`);
+    return response.data.data;
+  };
+
+  const {
+    data: customerAddress = [],
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["customerAddress", selectedCustomer],
+    queryFn: getCustomerAddress,
+  });
+
+  return { customerAddress, isLoading, isError, error, refetch };
+};
+
+// get product name
+export const useProductName = () => {
+  const getProduct = async () => {
+    const response = await API.get("/product");
+    return response.data.data;
+  };
+
+  const {
+    data: product = [],
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["product"],
+    queryFn: getProduct,
+  });
+
+  return { product, isLoading, isError, error, refetch };
+};
+
+export const useDeliveryAddress = (orderId) => {
+  const getSingleOrder = async () => {
+    console.log(orderId);
+    const response = await API.get("");
+    return response.data.order;
+  };
+
+  const {
+    data: singleOrder = [],
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["singleOrder", orderId],
+    queryFn: getSingleOrder,
+  });
+
+  return { singleOrder, isLoading, isError, error, refetch };
+};
+
+// Postal Code list
+export const usePostalCode = () => {
+  const getPostalCode = async () => {
+    const response = await API.get("/product/post-code");
+    return response.data.data;
+  };
+
+  const {
+    data: postalCode = [],
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["postalCode"],
+    queryFn: getPostalCode,
+  });
+
+  return { postalCode, isLoading, isError, error, refetch };
+};
+
+// get single product
+export const useSingleProduct = (productID) => {
+  const getSingleProduct = async () => {
+    const response = await API.get(`/product/${productID}`);
+    return response.data.data;
+  };
+  const {
+    data: singleProduct = [],
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["singleProduct", productID],
+    queryFn: getSingleProduct,
+  });
+  return { singleProduct, isLoading, isError, error, refetch };
+};
+
+// get single order
+export const useSingleOrder = (orderId) => {
+  const getSingleOrder = async () => {
+    console.log(orderId);
+    const response = await API.get(`/order/${orderId}`);
+    return response.data.order;
+  };
+  const {
+    data: singleOrder = [],
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["singleOrder", orderId],
+    queryFn: getSingleOrder,
+  });
+  return { singleOrder, isLoading, isError, error, refetch };
+};
+
+// get Permition
+export const usePermissionRole = () => {
+  const getPermissionRole = async () => {
+    const response = await API.get("/admins/rolewithpermission");
+    return response.data.data;
+  };
+
+  const {
+    data: permissionRole = [],
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["permissionRole"],
+    queryFn: getPermissionRole,
+  });
+
+  return { permissionRole, isLoading, isError, error, refetch };
+};

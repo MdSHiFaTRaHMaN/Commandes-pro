@@ -1,17 +1,40 @@
-import { Table, Input, Select, Spin } from "antd";
-import { FaTrashAlt, FaEdit,  } from "react-icons/fa";
+import { Table, Input, Select, Spin, Modal, message } from "antd";
+import { FaTrashAlt } from "react-icons/fa";
 import { useState, useEffect } from "react";
 import Search from "antd/es/transfer/search";
-import { useAllCustomers } from "../api/api";
+import { API, useAllCustomers } from "../api/api";
 
 const { Option } = Select;
 
 const Customers = () => {
-  const {allCustomer, loading, error} = useAllCustomers();
+  const { allCustomer, loading, error } = useAllCustomers();
 
   const [data, setData] = useState([]);
   const [editedData, setEditedData] = useState([]);
 
+  const handleDelete = async (id) => {
+    Modal.confirm({
+      title: "Are you sure you want to delete this user?",
+      content: "This action cannot be undone.",
+      okText: "Yes, Delete",
+      cancelText: "Cancel",
+      okType: "danger",
+      onOk: async () => {
+        try {
+          // Call the API to delete the user
+          await API.delete(`/user/delete/${id}`);
+          message.success("User deleted successfully!");
+          // Optionally refresh your data here
+        } catch (error) {
+          console.error("Error deleting user:", error);
+          message.error("Failed to delete the user. Please try again.");
+        }
+      },
+      onCancel() {
+        console.log("Deletion cancelled.");
+      },
+    });
+  };
   useEffect(() => {
     if (allCustomer) {
       const processedData = allCustomer.map((item, index) => ({
@@ -53,9 +76,7 @@ const Customers = () => {
       align: "center",
       width: 50,
       render: (text, record) => (
-        <span className="border px-4 py-2 rounded bg-white">
-          {record.id}
-        </span>
+        <span className="border px-4 py-2 rounded bg-white">{record.id}</span>
       ),
     },
     {
@@ -80,7 +101,9 @@ const Customers = () => {
         <Select
           value={record.account_type}
           className="w-full border-gray-300"
-          onChange={(value) => handleInputChange(record.key, "account_type", value)}
+          onChange={(value) =>
+            handleInputChange(record.key, "account_type", value)
+          }
         >
           <Option value="Restaurantion">Restaurantion</Option>
           <Option value="revendeur">Revendeur</Option>
@@ -140,10 +163,12 @@ const Customers = () => {
       dataIndex: "action",
       key: "action",
       align: "center",
-      render: () => (
+      render: (text, record) => (
         <div className="flex gap-2 justify-center">
-          <FaEdit className="text-yellow-600 cursor-pointer hover:text-yellow-800" />
-          <FaTrashAlt className="text-red-600 cursor-pointer hover:text-red-800" />
+          <FaTrashAlt
+            onClick={() => handleDelete(record.id)}
+            className="text-red-600 cursor-pointer hover:text-red-800"
+          />
         </div>
       ),
     },

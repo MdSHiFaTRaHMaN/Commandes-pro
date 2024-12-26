@@ -12,6 +12,16 @@ import Orders from "../pages/orders/Orders";
 import Test from "../pages/Test";
 import AdminEdit from "../pages/SettingsPage/AdminEdit";
 import AdminProfile from "../pages/AdminProfile";
+import EditProduct from "../pages/ProductPage/EditProduct";
+import InvoiceOrder from "../pages/orders/InvoiceOrder";
+import AddNewUser from "../pages/SettingsPage/AddNewUser";
+import AddOrder from "../pages/orders/AddOrder";
+import EditOrder from "../pages/orders/EditOrder";
+
+import PostalCode from "../pages/SettingsPage/PostalCode";
+import AddClient from "../pages/AddClient";
+import OrderInvoice from "../pages/orders/OrderInvoice";
+import MultiOrderInvoice from "../pages/orders/MultiOrderInvoice";
 
 export const router = createBrowserRouter([
   {
@@ -31,8 +41,16 @@ export const router = createBrowserRouter([
         element: <Products />,
       },
       {
+        path: "/products/edit/:productID",
+        element: <EditProduct />,
+      },
+      {
         path: "/orders",
         element: <Orders />,
+      },
+      {
+        path: "/orders/edit/:orderId",
+        element: <EditOrder />,
       },
       {
         path: "/test",
@@ -56,11 +74,35 @@ export const router = createBrowserRouter([
       },
       {
         path: "/admin-edit/:id",
-        element: <AdminEdit />
+        element: <AdminEdit />,
       },
       {
         path: "/admin-profile",
-        element: <AdminProfile />
+        element: <AdminProfile />,
+      },
+      {
+        path: "/add-new-user",
+        element: <AddNewUser />,
+      },
+      {
+        path: "/add-order",
+        element: <AddOrder />,
+      },
+      {
+        path: "/postal-code",
+        element: <PostalCode />
+      },
+      {
+        path: "/add-customer",
+        element: <AddClient />
+      },
+      {
+        path: "/order-invoice/:orderId",
+        element: <OrderInvoice />
+      },
+      {
+        path: "/multi-invoice",
+        element: <MultiOrderInvoice />
       }
     ],
   },
