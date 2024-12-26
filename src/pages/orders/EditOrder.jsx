@@ -7,24 +7,34 @@ import {
   DatePicker,
   Table,
   message,
+  Spin,
 } from "antd";
 import {
   API,
   useAllCustomers,
   useCustomerAddress,
+  useDeliveryAddress,
   useProductName,
+  useSingleOrder,
 } from "../../api/api";
 import dayjs from "dayjs";
 import { RiDeleteBin5Fill } from "react-icons/ri";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 const { Title, Text } = Typography;
 const { Option } = Select;
 
-const AddOrder = () => {
+const EditOrder = () => {
+  const { orderId } = useParams();
+  const { singleOrder, isLoading, isError, error, refetch } =
+    useSingleOrder(orderId);
+
   const { allCustomer } = useAllCustomers();
+  const { deliveryAddress } = useDeliveryAddress();
   const [selectedCustomer, setSelectedCustomer] = useState(0);
-  const [selectedAddress, setSelectedAddress] = useState(null);
+  const [selectedCustomerName, setSelectedCustomerName] = useState();
+  const [selectedAddress, setSelectedAddress] = useState(0);
+  const [selectedAddressName, setSelectedAddressName] = useState();
   const [deliveryDate, setDeliveryDate] = useState(null);
   const { customerAddress } = useCustomerAddress(selectedCustomer);
   const [subtotalExcludingVAT, setSubtotalExcludingVAT] = useState(0);
@@ -32,6 +42,14 @@ const AddOrder = () => {
   const [productUploading, setOrderUploading] = useState(false);
   const [accountType, setAccountType] = useState("");
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (singleOrder) {
+      setDeliveryDate(singleOrder.delivery_date);
+      setSelectedCustomer(singleOrder.created_by);
+      setSelectedAddress(singleOrder.user_delivery_address_id);
+    }
+  }, [singleOrder]);
 
   const { product } = useProductName();
   const productId = product.map((prdt) => ({
@@ -53,7 +71,7 @@ const AddOrder = () => {
       key: "1",
       id: 0,
       productId: "",
-      quantity: 1,
+      quantity: 0,
       comment: "",
       unitPrice: "",
       vat: "",
@@ -61,25 +79,57 @@ const AddOrder = () => {
     },
   ]);
 
+  useEffect(() => {
+    if (singleOrder && singleOrder.products) {
+      const formattedData = singleOrder.products.map((product, index) => ({
+        key: index + 1,
+        productId: product.product_id,
+        quantity: product.quantity,
+        unitPrice: product.price,
+        vat: product.tax || 0, // Assuming tax field exists or set to 0
+        total: (product.quantity * product.price).toFixed(2), // Calculate total
+      }));
+      setData(formattedData);
+    }
+  }, [singleOrder]);
+
+  useEffect(() => {
+    const subtotal = data.reduce(
+      (acc, item) =>
+        acc + (parseFloat(item.unitPrice) * parseFloat(item.quantity) || 0),
+      0
+    );
+    setSubtotalExcludingVAT(subtotal);
+
+    const vat20 = subtotal * 0.2;
+    const vat5_5 = subtotal * 0.055;
+    setTotalIncludingVAT(subtotal + vat20 + vat5_5);
+  }, [data]);
+
   const columns = [
     {
       title: "Product Name",
       dataIndex: "productId",
       key: "productId",
       width: 200,
-      render: (id, record) => (
-        <Select
-          showSearch
-          className="h-12"
-          placeholder="Select a product"
-          optionFilterProp="label"
-          options={productId}
-          onChange={(value) =>
-            handleInputChange(record.key, "productId", value)
-          }
-        />
-      ),
+      render: (id, record) => {
+        const product = productId.find((item) => item.value === id);
+        return (
+          <Select
+            showSearch
+            className="h-12"
+            placeholder="Select a product"
+            optionFilterProp="label"
+            options={productId}
+            value={product ? product.label : null}
+            onChange={(value) =>
+              handleInputChange(record.key, "productId", value)
+            }
+          />
+        );
+      },
     },
+
     {
       title: "Quantity",
       dataIndex: "quantity",
@@ -89,7 +139,7 @@ const AddOrder = () => {
           placeholder="Enter quantity"
           type="number"
           className="py-3"
-          defaultValue={1}
+          value={record.quantity}
           onChange={(e) =>
             handleInputChange(record.key, "quantity", e.target.value)
           }
@@ -266,8 +316,20 @@ const AddOrder = () => {
   useEffect(() => {
     if (userData) {
       setAccountType(userData.account_type);
+      setSelectedCustomerName(userData.name);
     }
   }, [userData]);
+
+  const userDeliveryAdd = deliveryAddress.find(
+    (deliAdd) => deliAdd.id == selectedAddress
+  );
+
+  useEffect(() => {
+    if (userDeliveryAdd) {
+      setSelectedAddress(userDeliveryAdd.id);
+      setSelectedAddressName(userDeliveryAdd.address);
+    }
+  }, [userDeliveryAdd]);
 
   const handleSaveOrder = async () => {
     const orderData = {
@@ -289,14 +351,17 @@ const AddOrder = () => {
 
     try {
       setOrderUploading(true);
-      const response = await API.post(
-        `/order/create/${selectedCustomer}`,
+      const response = await API.put(
+        `/order/update-price/${orderId}`,
         orderData
       );
+
+      console.log("response", response);
       if (response.status == 200) {
-        message.success("Order Added Successfully");
-        navigate("/orders");
+        message.success("Order Update Successfully");
+        // navigate("/orders");
       }
+      refetch();
       setOrderUploading(false);
     } catch (error) {
       console.error(error);
@@ -305,51 +370,57 @@ const AddOrder = () => {
     }
   };
 
+  if (isLoading) return <Spin size="large" className="block mx-auto my-10" />;
+  if (isError)
+    return (
+      <div className="text-center text-red-500">
+        {error.message || "Something went wrong"}
+      </div>
+    );
+
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100 my-4">
       <div className="w-full max-w-6xl bg-white shadow-lg rounded-lg p-8">
         <Title level={3} className="text-pink-500 text-center mb-6">
-          Add an Order
+          Modifier la Commande
         </Title>
         <div>
           <Text className="block mb-2 font-medium">Order number:</Text>
           <Input
             placeholder="Enter Your Order number"
             className="w-full h-12"
+            defaultValue={singleOrder?.id}
           />
         </div>
         <div className="my-3">
           <Text className="block mb-2 font-medium">Delivery Date</Text>
+
           <DatePicker
             format="YYYY-MM-DD HH:mm:ss"
             className="w-full h-12"
             disabledDate={disabledDate}
             disabledTime={disabledDateTime}
             onChange={(date) => setDeliveryDate(date)}
+            value={dayjs(`${deliveryDate} 00:00:00`, "YYYY-MM-DD HH:mm:ss")}
             showTime={{
               defaultValue: dayjs("00:00:00", "HH:mm:ss"),
             }}
           />
         </div>
-        {/* <div className="my-3">
-          <Text className="block mb-2 font-medium">Order Status</Text>
-          <Select placeholder="Select Order Status" className="w-full h-12">
-            <Option value="active">Active</Option>
-            <Option value="deactive">Deactive</Option>
-            <Option value="cancel">Cancelled</Option>
-          </Select>
-        </div> */}
+
         <h1 className="text-2xl font-semibold my-3">Customer</h1>
         <div>
           <Text className="block mb-2 font-medium">Select Customer</Text>
+
           <Select
             placeholder="Select a customer"
             className="w-full h-12"
+            value={selectedCustomerName}
             onChange={(value) => setSelectedCustomer(value)}
           >
-            {allCustomer.map((name) => (
-              <Option key={name.id} value={name.id}>
-                {name.name}
+            {allCustomer.map((cust) => (
+              <Option key={cust.id} value={cust.id}>
+                {cust.name}
               </Option>
             ))}
           </Select>
@@ -363,6 +434,7 @@ const AddOrder = () => {
           <Select
             placeholder="Select an address"
             className="w-full h-12"
+            value={selectedAddressName}
             onChange={(value) => setSelectedAddress(value)}
           >
             {customerAddress.map((address) => (
@@ -441,4 +513,4 @@ const AddOrder = () => {
   );
 };
 
-export default AddOrder;
+export default EditOrder;

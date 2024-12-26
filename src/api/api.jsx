@@ -351,7 +351,6 @@ export const useProductName = () => {
 
 export const useSingleOrder = (orderId) => {
   const getSingleOrder = async () => {
-    console.log(orderId);
     const response = await API.get(`/order/${orderId}`);
     return response.data.order;
   };
@@ -368,4 +367,24 @@ export const useSingleOrder = (orderId) => {
   });
 
   return { singleOrder, isLoading, isError, error, refetch };
+};
+
+export const useDeliveryAddress = () => {
+  const getDeliveryAddress = async () => {
+    const response = await API.get("/delivery-addresss/all");
+    return response.data.data;
+  };
+
+  const {
+    data: deliveryAddress = [],
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["deliveryAddress"],
+    queryFn: getDeliveryAddress,
+  });
+
+  return { deliveryAddress, isLoading, isError, error, refetch };
 };

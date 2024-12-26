@@ -119,10 +119,6 @@ const Orders = () => {
     }
   };
 
-  const handleEdit = (value) => {
-    console.log("handleEdit", value);
-  };
-
   const handlePrint = (value) => {
     console.log("handlePrint", value);
   };
@@ -222,11 +218,9 @@ const Orders = () => {
               onClick={() => handlePrint(record)}
             />
           </Link>
-
-          <FaEdit
-            className="cursor-pointer"
-            onClick={() => handleEdit(record)}
-          />
+          <Link to={`/orders/edit/${record.id}`}>
+            <FaEdit className="cursor-pointer" />
+          </Link>
         </div>
       ),
     },

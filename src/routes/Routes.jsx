@@ -16,6 +16,7 @@ import EditProduct from "../pages/ProductPage/EditProduct";
 import InvoiceOrder from "../pages/orders/InvoiceOrder";
 import AddNewUser from "../pages/SettingsPage/AddNewUser";
 import AddOrder from "../pages/orders/AddOrder";
+import EditOrder from "../pages/orders/EditOrder";
 
 export const router = createBrowserRouter([
   {
@@ -41,6 +42,10 @@ export const router = createBrowserRouter([
       {
         path: "/orders",
         element: <Orders />,
+      },
+      {
+        path: "/orders/edit/:orderId",
+        element: <EditOrder />,
       },
       {
         path: "/test",
