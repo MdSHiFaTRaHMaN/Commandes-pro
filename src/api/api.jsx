@@ -100,27 +100,6 @@ export const useAllProduct = ({ page = 1, limit = 10 } = {}) => {
   return { allProduct, pagination, isLoading, isError, error, refetch };
 };
 
-// get single product
-export const useSingleProduct = (productID) => {
-  const getSingleProduct = async () => {
-    const response = await API.get(`/product/${productID}`);
-    return response.data.data;
-  };
-
-  const {
-    data: singleProduct = [],
-    isLoading,
-    isError,
-    error,
-    refetch,
-  } = useQuery({
-    queryKey: ["singleProduct", productID],
-    queryFn: getSingleProduct,
-  });
-
-  return { singleProduct, isLoading, isError, error, refetch };
-};
-
 // All user show
 export const useAllCustomers = () => {
   const getCustomer = async () => {
@@ -347,11 +326,10 @@ export const useProductName = () => {
   return { product, isLoading, isError, error, refetch };
 };
 
-// get single order
-
-export const useSingleOrder = (orderId) => {
+export const useDeliveryAddress = (orderId) => {
   const getSingleOrder = async () => {
-    const response = await API.get(`/order/${orderId}`);
+    console.log(orderId);
+    const response = await API.get("");
     return response.data.order;
   };
 
@@ -369,22 +347,83 @@ export const useSingleOrder = (orderId) => {
   return { singleOrder, isLoading, isError, error, refetch };
 };
 
-export const useDeliveryAddress = () => {
-  const getDeliveryAddress = async () => {
-    const response = await API.get("/delivery-addresss/all");
+// Postal Code list
+export const usePostalCode = () => {
+  const getPostalCode = async () => {
+    const response = await API.get("/product/post-code");
     return response.data.data;
   };
 
   const {
-    data: deliveryAddress = [],
+    data: postalCode = [],
     isLoading,
     isError,
     error,
     refetch,
   } = useQuery({
-    queryKey: ["deliveryAddress"],
-    queryFn: getDeliveryAddress,
+    queryKey: ["postalCode"],
+    queryFn: getPostalCode,
   });
 
-  return { deliveryAddress, isLoading, isError, error, refetch };
+  return { postalCode, isLoading, isError, error, refetch };
+};
+
+// get single product
+export const useSingleProduct = (productID) => {
+  const getSingleProduct = async () => {
+    const response = await API.get(`/product/${productID}`);
+    return response.data.data;
+  };
+  const {
+    data: singleProduct = [],
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["singleProduct", productID],
+    queryFn: getSingleProduct,
+  });
+  return { singleProduct, isLoading, isError, error, refetch };
+};
+
+// get single order
+export const useSingleOrder = (orderId) => {
+  const getSingleOrder = async () => {
+    console.log(orderId);
+    const response = await API.get(`/order/${orderId}`);
+    return response.data.order;
+  };
+  const {
+    data: singleOrder = [],
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["singleOrder", orderId],
+    queryFn: getSingleOrder,
+  });
+  return { singleOrder, isLoading, isError, error, refetch };
+};
+
+// get Permition
+export const usePermissionRole = () => {
+  const getPermissionRole = async () => {
+    const response = await API.get("/admins/rolewithpermission");
+    return response.data.data;
+  };
+
+  const {
+    data: permissionRole = [],
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["permissionRole"],
+    queryFn: getPermissionRole,
+  });
+
+  return { permissionRole, isLoading, isError, error, refetch };
 };

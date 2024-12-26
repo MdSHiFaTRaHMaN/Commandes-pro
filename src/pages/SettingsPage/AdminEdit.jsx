@@ -8,29 +8,49 @@ import {
   notification,
 } from "antd";
 import { useParams } from "react-router-dom";
-import { API, useAdminList } from "../../api/api";
+import { API, useAdminList, usePermissionRole } from "../../api/api";
+import { useState, useEffect } from "react";
 
 const { Title } = Typography;
 
 const AdminEdit = () => {
-  const { id } = useParams(); // Get id from URL
-  const { adminList, loading } = useAdminList(); // Fetch admin list
+  const { id } = useParams();
+  const { adminList, loading: adminLoading } = useAdminList();
+  const { permissionRole, loading: roleLoading } = usePermissionRole();
+
   const adminData = adminList?.find((admin) => admin.id === parseInt(id));
+  const [selectedRole, setSelectedRole] = useState(null);
+  const [selectId, setSelectId] = useState()
 
   const [form] = Form.useForm();
 
-  // Handle form submission
+  useEffect(() => {
+    if (adminData) {
+      const role = permissionRole.find(
+        (role) => role.role_name === adminData.role_name
+      );
+      setSelectedRole(role);
+    }
+  }, [adminData, permissionRole]);
+
+  const handleRoleChange = (roleId) => {
+    setSelectId(roleId)
+    const selected = permissionRole.find((role) => role.role_id === roleId);
+    setSelectedRole(selected);
+  };
+
   const handleSubmit = async (values) => {
     const { first_name, last_name } = values;
 
-    const nameEdit = { first_name, last_name };
+    
+
     notification.success({
-      message: `Profile Updated by${first_name} ${last_name} `,
+      message: `Profile Updated: ${first_name} ${last_name}`,
       description: "Your profile has been updated successfully.",
     });
   };
 
-  if (!adminList) {
+  if (adminLoading || roleLoading) {
     return (
       <div className="flex justify-center items-center h-screen">
         <Spin size="large" />
@@ -41,7 +61,7 @@ const AdminEdit = () => {
   if (!adminData) {
     return (
       <div className="flex justify-center items-center h-screen">
-        <Spin size="large" />
+        <p>No admin found with the specified ID.</p>
       </div>
     );
   }
@@ -92,14 +112,36 @@ const AdminEdit = () => {
           name="role"
           rules={[{ required: true, message: "Please select a role!" }]}
         >
-          <Select className="rounded-md">
-            <Select.Option value="SuperAdmin">Super Admin</Select.Option>
-            <Select.Option value="Admin">Admin</Select.Option>
-            <Select.Option value="User">User</Select.Option>
+          <Select
+            className="rounded-md"
+            onChange={handleRoleChange}
+            placeholder="Select a role"
+          >
+            {permissionRole.map((role) => (
+              <Select.Option key={role.role_id} value={role.role_id}>
+                {role.role_name}
+              </Select.Option>
+            ))}
           </Select>
         </Form.Item>
 
         <div className="text-pink-600 font-semibold">Access Rights</div>
+        {selectedRole && selectedRole.permissions.length > 0 ? (
+          <div className="permissions">
+            {selectedRole.permissions.map((permission, index) => (
+              <div key={index} className="mb-4">
+                <h2 className="font-bold text-lg">{permission.section}</h2>
+                <ul className="list-disc ml-6">
+                  {permission.name.map((action, i) => (
+                    <li key={i}>{action}</li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p>No permissions available for this role.</p>
+        )}
 
         <Form.Item>
           <Button

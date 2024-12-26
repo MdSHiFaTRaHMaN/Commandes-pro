@@ -15,7 +15,8 @@ import { FaEdit, FaPlus } from "react-icons/fa";
 import { IoPrint } from "react-icons/io5";
 import "./Orders.css";
 import { API, useAllOrders } from "../../api/api";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import MultiOrderInvoice from "./MultiOrderInvoice";
 const EditableContext = React.createContext(null);
 const EditableRow = ({ index, ...props }) => {
   const [form] = Form.useForm();
@@ -212,13 +213,14 @@ const Orders = () => {
 
       render: (_, record) => (
         <div className="flex gap-3 text-xl">
-          <Link to={`/order/${record.id}`}>
+        <Link to={`/order-invoice/${record.id}`}>
             <IoPrint
               className="cursor-pointer"
               onClick={() => handlePrint(record)}
             />
           </Link>
-          <Link to={`/orders/edit/${record.id}`}>
+     
+<Link to={`/orders/edit/${record.id}`}>
             <FaEdit className="cursor-pointer" />
           </Link>
         </div>
@@ -264,9 +266,13 @@ const Orders = () => {
 
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [invoice, setInvoice] = useState();
+
   const onSelectedData = (value) => {
     setLoading(true);
+    setInvoice(value);
     console.log("hello Data", value);
+
     setLoading(false);
   };
   const onSelectChange = (newSelectedRowKeys) => {
@@ -309,18 +315,24 @@ const Orders = () => {
           columns={columns}
         />
         <div className="text-center mt-[-40px]">
-          <Button
-            onClick={() => onSelectedData(selectedRowKeys)}
-            loading={loading}
-            disabled={!hasSelected}
-            type="primary"
-            onMouseEnter={(e) => (e.target.style.backgroundColor = "#f54080")}
-            onMouseLeave={(e) => (e.target.style.backgroundColor = "#e24c80")}
-            className="bg-[#e24c80] text-white font-semibold hover:bg-[#f83f80] py-6 px-6"
-          >
-            Bon de Préparation
-          </Button>
+          {console.log("invoice", invoice)}
+          <Link to="/multi-invoice">
+            <Button
+              onClick={() => onSelectedData(selectedRowKeys)}
+              loading={loading}
+              disabled={!hasSelected}
+              type="primary"
+              onMouseEnter={(e) => (e.target.style.backgroundColor = "#f54080")}
+              onMouseLeave={(e) => (e.target.style.backgroundColor = "#e24c80")}
+              className="bg-[#e24c80] text-white font-semibold hover:bg-[#f83f80] py-6 px-6"
+            >
+              Bon de Préparation
+            </Button>
+          </Link>
         </div>
+      </div>
+      <div className="hidden">
+        <MultiOrderInvoice multiOrder={invoice} />
       </div>
     </div>
   );

@@ -113,7 +113,7 @@ const EditOrder = () => {
       key: "productId",
       width: 200,
       render: (id, record) => {
-        const product = productId.find((item) => item.value === id);
+        const product = productId?.find((item) => item.value === id);
         return (
           <Select
             showSearch
@@ -154,7 +154,7 @@ const EditOrder = () => {
       key: "unitPrice",
 
       render: (text, record) => {
-        const product = productId.find(
+        const product = productId?.find(
           (item) => item.value == record.productId
         );
 
@@ -188,7 +188,7 @@ const EditOrder = () => {
       key: "vat",
 
       render: (text, record) => {
-        const product = productId.find(
+        const product = productId?.find(
           (item) => item.value == record.productId
         );
         return (
@@ -270,7 +270,7 @@ const EditOrder = () => {
         const updatedItem = { ...item, [field]: value };
 
         if (field === "productId") {
-          const product = productId.find((prod) => prod.value === value);
+          const product = productId?.find((prod) => prod.value === value);
           const price =
             accountType == "Restauration"
               ? product.regular_price
@@ -311,7 +311,7 @@ const EditOrder = () => {
     setTotalIncludingVAT(subtotal + vatAmount);
   };
 
-  const userData = allCustomer.find((cust) => cust.id == selectedCustomer);
+  const userData = allCustomer?.find((cust) => cust.id == selectedCustomer);
 
   useEffect(() => {
     if (userData) {
@@ -320,7 +320,7 @@ const EditOrder = () => {
     }
   }, [userData]);
 
-  const userDeliveryAdd = deliveryAddress.find(
+  const userDeliveryAdd = deliveryAddress?.find(
     (deliAdd) => deliAdd.id == selectedAddress
   );
 
