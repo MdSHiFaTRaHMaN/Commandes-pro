@@ -3,8 +3,8 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 
 export const API = axios.create({
-  // baseURL: "https://grocary-ecommerce.vercel.app/api/v1",
-  baseURL: "http://localhost:5000/api/v1",
+  baseURL: "https://grocary-ecommerce.vercel.app/api/v1",
+  // baseURL: "http://localhost:5000/api/v1",
 });
 
 API.interceptors.request.use((config) => {
@@ -231,26 +231,6 @@ export const useUserRole = () => {
   return { userRole, isLoading, isError, error, refetch };
 };
 // get user role with permition
-export const useRolePermission = () => {
-  const getRolePermission = async () => {
-    const response = await API.get(`/admins/role/2`);
-    console.log(response)
-    return response.data.data;
-  };
-
-  const {
-    data: rolePermission = [],
-    isLoading,
-    isError,
-    error,
-    refetch,
-  } = useQuery({
-    queryKey: ["rolePermission"],
-    queryFn: getRolePermission,
-  });
-
-  return { rolePermission, isLoading, isError, error, refetch };
-};
 
 // get customer address
 export const useCustomerAddress = (selectedCustomer) => {
@@ -292,4 +272,86 @@ export const useProductName = () => {
   });
 
   return { product, isLoading, isError, error, refetch };
+};
+
+// Postal Code list
+export const usePostalCode = () => {
+  const getPostalCode = async () => {
+    const response = await API.get("/product/post-code");
+    return response.data.data;
+  };
+
+  const {
+    data: postalCode = [],
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["postalCode", ],
+    queryFn: getPostalCode,
+  });
+
+  return { postalCode, isLoading, isError, error, refetch };
+};
+
+
+// get single product
+export const useSingleProduct = (productID) => {
+  const getSingleProduct = async () => {
+    const response = await API.get(`/product/${productID}`);
+    return response.data.data;
+  };
+  const {
+    data: singleProduct = [],
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["singleProduct", productID],
+    queryFn: getSingleProduct,
+  });
+  return { singleProduct, isLoading, isError, error, refetch };
+};
+
+// get single order
+export const useSingleOrder = (orderId) => {
+  const getSingleOrder = async () => {
+    console.log(orderId);
+    const response = await API.get(`/order/${orderId}`);
+    return response.data.order;
+  };
+  const {
+    data: singleOrder = [],
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["singleOrder", orderId],
+    queryFn: getSingleOrder,
+  });
+  return { singleOrder, isLoading, isError, error, refetch };
+};
+
+// get Permition
+export const usePermissionRole = () => {
+  const getPermissionRole = async () => {
+    const response = await API.get("/admins/rolewithpermission");
+    return response.data.data;
+  };
+
+  const {
+    data: permissionRole = [],
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["permissionRole" ],
+    queryFn: getPermissionRole,
+  });
+
+  return { permissionRole, isLoading, isError, error, refetch };
 };

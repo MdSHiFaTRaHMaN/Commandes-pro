@@ -53,7 +53,10 @@ const Navbar = () => {
     },
     {
       label: (
-        <Link to="/add-new-user" className="text-lg font-semibold text-red-700 hover:text-red-800">
+        <Link
+          to="/add-new-user"
+          className="text-lg font-semibold text-red-700 hover:text-red-800"
+        >
           Add New User
         </Link>
       ),
@@ -69,9 +72,12 @@ const Navbar = () => {
     },
     {
       label: (
-        <a className="text-lg font-semibold text-red-700 hover:text-blue-800">
-          Zip
-        </a>
+        <Link
+          to="/postal-code"
+          className="text-lg font-semibold text-red-700 hover:text-blue-800"
+        >
+          Postal Code
+        </Link>
       ),
       key: "3",
     },
@@ -174,17 +180,19 @@ const Navbar = () => {
               <Button
                 color="danger"
                 variant="outlined"
-                className="text-md font-semibold"
+                className="text-md font-semibold py-5"
               >
                 AJOUTER UNE CMD
               </Button>
-              <Button
-                color="danger"
-                variant="outlined"
-                className="text-md font-semibold"
-              >
-                AJOUTER UN CLIENT
-              </Button>
+              <Link to="/add-customer">
+                <Button
+                  color="danger"
+                  variant="outlined"
+                  className="text-md font-semibold py-5"
+                >
+                  AJOUTER UN CLIENT
+                </Button>
+              </Link>
             </div>
           </div>
         </div>

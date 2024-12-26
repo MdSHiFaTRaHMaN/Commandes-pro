@@ -14,6 +14,10 @@ import AdminEdit from "../pages/SettingsPage/AdminEdit";
 import AdminProfile from "../pages/AdminProfile";
 import AddNewUser from "../pages/SettingsPage/AddNewUser";
 import AddOrder from "../pages/orders/AddOrder";
+import PostalCode from "../pages/SettingsPage/PostalCode";
+import AddClient from "../pages/AddClient";
+import OrderInvoice from "../pages/orders/OrderInvoice";
+import MultiOrderInvoice from "../pages/orders/MultiOrderInvoice";
 
 export const router = createBrowserRouter([
   {
@@ -71,6 +75,22 @@ export const router = createBrowserRouter([
       {
         path: "/add-order",
         element: <AddOrder />
+      },
+      {
+        path: "/postal-code",
+        element: <PostalCode />
+      },
+      {
+        path: "/add-customer",
+        element: <AddClient />
+      },
+      {
+        path: "/order-invoice/:orderId",
+        element: <OrderInvoice />
+      },
+      {
+        path: "/multi-invoice",
+        element: <MultiOrderInvoice />
       }
     ],
   },
