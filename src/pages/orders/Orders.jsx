@@ -204,7 +204,7 @@ const Orders = () => {
     {
       title: "TOTAL TTC",
       dataIndex: "total",
-      render: (_, record) => `${record.total} €`,
+      render: (_, record) => `${record.total.toFixed(2)} €`,
       editable: true,
     },
     {
@@ -213,14 +213,14 @@ const Orders = () => {
 
       render: (_, record) => (
         <div className="flex gap-3 text-xl">
-        <Link to={`/order-invoice/${record.id}`}>
+          <Link to={`/order-invoice/${record.id}`}>
             <IoPrint
               className="cursor-pointer"
               onClick={() => handlePrint(record)}
             />
           </Link>
-     
-<Link to={`/orders/edit/${record.id}`}>
+
+          <Link to={`/orders/edit/${record.id}`}>
             <FaEdit className="cursor-pointer" />
           </Link>
         </div>

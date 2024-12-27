@@ -177,13 +177,16 @@ const Navbar = () => {
             </div>
 
             <div className="flex justify-center gap-3 mt-6 lg:flex lg:mt-0 lg:-mx-2">
-              <Button
-                color="danger"
-                variant="outlined"
-                className="text-md font-semibold py-5"
-              >
-                AJOUTER UNE CMD
-              </Button>
+              <Link to="/add-order">
+                <Button
+                  color="danger"
+                  variant="outlined"
+                  className="text-md font-semibold py-5"
+                >
+                  AJOUTER UNE CMD
+                </Button>
+              </Link>
+
               <Link to="/add-customer">
                 <Button
                   color="danger"
