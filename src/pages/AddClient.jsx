@@ -1,6 +1,5 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Input, Select, DatePicker, Button, message } from "antd";
-import { FaPlus } from "react-icons/fa";
 import { API } from "../api/api";
 
 const { Option } = Select;
@@ -66,22 +65,6 @@ const AddClient = () => {
       setLoading(false);
     }
 
-    // {
-    //   "email": "user@gmail.com",
-    //   "account_type": "Premium",
-    //   "siret": "12345678901234"
-    //   "company": "Doe Consulting Ltd.",
-    //   "post_code": "75001",
-    //   "account_phone": "+1234567890",
-    //   "contract_comptabilité": "Contract_12345",
-    //   "contract_facturation": "Billing_67890",
-
-    //   "password": "123456",
-    //   "city": "Paris",
-    //   "account_email": "account.johndoe@example.com",
-    //   "brand": "Doe Enterprises",
-    //   "name": "John Doe",
-    // }
   };
 
   return (

@@ -18,6 +18,8 @@ import PostalCode from "../pages/SettingsPage/PostalCode";
 import AddClient from "../pages/AddClient";
 import OrderInvoice from "../pages/orders/OrderInvoice";
 import MultiOrderInvoice from "../pages/orders/MultiOrderInvoice";
+import Setting from "../pages/app/Setting";
+import PageManegment from "../pages/app/PageManegment";
 
 export const router = createBrowserRouter([
   {
@@ -91,11 +93,19 @@ export const router = createBrowserRouter([
       {
         path: "/multi-invoice",
         element: <MultiOrderInvoice />
-      }
+      },
+      {
+        path: "/update-password",
+        element: <Setting />
+      },
+      {
+        path: "/page-manegment",
+        element: <PageManegment />
+      },
     ],
   },
   {
     path: "/login",
     element: <Login />,
-  },
+  }
 ]);
