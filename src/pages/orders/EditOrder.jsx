@@ -332,6 +332,8 @@ const EditOrder = () => {
   }, [userDeliveryAdd]);
 
   const handleSaveOrder = async () => {
+    const filteredData = data.filter((item) => item.productId && item.quantity);
+
     const orderData = {
       company: userData.company,
       delivery_date: deliveryDate,
@@ -342,7 +344,7 @@ const EditOrder = () => {
       delivery_fee: 5.0,
       total: totalIncludingVAT,
       user_delivery_address_id: selectedAddress,
-      products: data.map((item) => ({
+      products: filteredData.map((item) => ({
         product_id: item.productId,
         quantity: item.quantity,
         price: item.unitPrice,
@@ -359,9 +361,8 @@ const EditOrder = () => {
       console.log("response", response);
       if (response.status == 200) {
         message.success("Order Update Successfully");
-        // navigate("/orders");
+        refetch();
       }
-      refetch();
       setOrderUploading(false);
     } catch (error) {
       console.error(error);

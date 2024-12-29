@@ -17,6 +17,7 @@ import {
 import dayjs from "dayjs";
 import { RiDeleteBin5Fill } from "react-icons/ri";
 import { useNavigate } from "react-router-dom";
+import AddAddressModel from "./AddAddressModel";
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -26,7 +27,7 @@ const AddOrder = () => {
   const [selectedCustomer, setSelectedCustomer] = useState(0);
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [deliveryDate, setDeliveryDate] = useState(null);
-  const { customerAddress } = useCustomerAddress(selectedCustomer);
+  const { customerAddress, refetch } = useCustomerAddress(selectedCustomer);
   const [subtotalExcludingVAT, setSubtotalExcludingVAT] = useState(0);
   const [totalIncludingVAT, setTotalIncludingVAT] = useState(0);
   const [productUploading, setOrderUploading] = useState(false);
@@ -34,6 +35,7 @@ const AddOrder = () => {
   const navigate = useNavigate();
 
   const { product } = useProductName();
+
   const productId = product.map((prdt) => ({
     value: prdt.id,
     label: prdt.name,
@@ -308,8 +310,13 @@ const AddOrder = () => {
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100 my-4">
       <div className="w-full max-w-6xl bg-white shadow-lg rounded-lg p-8">
-        <Title level={3} className="text-pink-500 text-center mb-6">
-          Add an Order
+        <Title
+          level={3}
+          className="text-pink-500 text-2xl font-bold mb-6 text-center"
+        >
+          <span className="text-pink-500 text-2xl font-bold mb-6 text-center">
+            Add an Order
+          </span>
         </Title>
         <div>
           <Text className="block mb-2 font-medium">Order number:</Text>
@@ -356,9 +363,16 @@ const AddOrder = () => {
         </div>
 
         <div>
-          <Text className="block mb-2 font-medium">
-            Select Delivery Address
-          </Text>
+          <div className="flex justify-between items-center my-2">
+            <Text className="block mb-2 font-medium">
+              Select Delivery Address
+            </Text>
+
+            <AddAddressModel
+              selectCustomer={selectedCustomer}
+              refetch={refetch}
+            />
+          </div>
 
           <Select
             placeholder="Select an address"

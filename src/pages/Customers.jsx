@@ -1,16 +1,53 @@
-import { Table, Input, Select, Spin, Modal, message } from "antd";
+import { Table, Input, Select, Spin, Modal, message, notification } from "antd";
 import { FaTrashAlt } from "react-icons/fa";
 import { useState, useEffect } from "react";
-import Search from "antd/es/transfer/search";
 import { API, useAllCustomers } from "../api/api";
 
 const { Option } = Select;
 
 const Customers = () => {
-  const { allCustomer, loading, error } = useAllCustomers();
+  const { allCustomer, isLoading, error, refetch } = useAllCustomers();
 
   const [data, setData] = useState([]);
   const [editedData, setEditedData] = useState([]);
+
+
+  const handleAccountType = (value, id) =>{
+    console.log("id",id)
+    console.log("value",value)
+
+    // ------Need api to update account type------- 
+  }
+
+  const handleStatusChange = async (value, id) => {
+
+    const status = id;
+    const updateStatus = { status };
+    const selectID = value;
+
+    try {
+      // API call
+      await API.put(`/user/status/${selectID}`, updateStatus);
+
+      // Success notification
+      notification.success({
+        message: "Status Updated",
+        description: "Your status has been updated successfully.",
+      });
+
+      // Optionally refetch the data
+      refetch();
+    } catch (error) {
+      console.error("Status update failed", error);
+
+      // Error notification
+      notification.error({
+        message: "Status Update Failed",
+        description:
+          "An error occurred while updating the status. Please try again later.",
+      });
+    }
+  };
 
   const handleDelete = async (id) => {
     Modal.confirm({
@@ -24,7 +61,7 @@ const Customers = () => {
           // Call the API to delete the user
           await API.delete(`/user/delete/${id}`);
           message.success("User deleted successfully!");
-          // Optionally refresh your data here
+          refetch();
         } catch (error) {
           console.error("Error deleting user:", error);
           message.error("Failed to delete the user. Please try again.");
@@ -57,6 +94,7 @@ const Customers = () => {
       item.key === key ? { ...item, [field]: value } : item
     );
     setData(updatedData);
+    refetch();
 
     const updatedEditedData = updatedData.filter((item) =>
       item.key === key
@@ -65,7 +103,7 @@ const Customers = () => {
     );
     setEditedData(updatedEditedData);
 
-    console.log("Edited Data:", updatedEditedData);
+    console.log("Edited Data:", updatedEditedData.id);
   };
 
   const columns = [
@@ -102,12 +140,13 @@ const Customers = () => {
           value={record.account_type}
           className="w-full border-gray-300"
           onChange={(value) =>
-            handleInputChange(record.key, "account_type", value)
+            handleAccountType(record.id, value)
           }
         >
-          <Option value="Restaurantion">Restaurantion</Option>
-          <Option value="revendeur">Revendeur</Option>
+          <Option value="Restauration">Restauration</Option>
+          <Option value="Revendeur">Revendeur</Option>
           <Option value="Grossiste">Grossiste</Option>
+          <Option value="Supper Marcent">Supper Marcent</Option>
         </Select>
       ),
     },
@@ -145,16 +184,15 @@ const Customers = () => {
       title: "Status",
       dataIndex: "status",
       key: "status",
-      width: 150,
-      render: (text, record) => (
+      render: (id, record) => (
         <Select
           value={record.status}
           className="w-full border-gray-300"
-          onChange={(value) => handleInputChange(record.key, "status", value)}
+          onChange={(value) => handleStatusChange(record.id, value)} // Correctly passing ID and new status value
         >
           <Option value="Active">Active</Option>
-          <Option value="in active">In Active</Option>
-          <Option value="blocklist">Blocklist</Option>
+          <Option value="In Active">In Active</Option>
+          <Option value="Blocklist">Blocklist</Option>
         </Select>
       ),
     },
@@ -181,15 +219,13 @@ const Customers = () => {
   };
   const content = <div style={contentStyle} />;
   // loading
-  if (loading)
+  if (isLoading)
     return (
       <Spin tip="Loading" size="large">
         {content}
       </Spin>
     );
   if (error) return <div>Error loading Customers</div>;
-  // search funsion
-  const onSearch = (value, _e, info) => console.log(info?.source, value);
 
   return (
     <div className="p-4 bg-gray-100 min-h-screen">
@@ -198,15 +234,6 @@ const Customers = () => {
           <h1 className="text-2xl font-bold mb-6 text-gray-800">
             Customer Table
           </h1>
-        </div>
-        <div>
-          <Search
-            placeholder="Search by Order ID"
-            allowClear
-            enterButton="Search"
-            size="large"
-            onSearch={onSearch}
-          />
         </div>
       </div>
 

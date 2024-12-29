@@ -33,7 +33,7 @@ const Login = () => {
   };
 
   const onFinishFailed = (errorInfo) => {
-    message.error("Please input valid email and password.");
+    message.error("Please input valid email and password.", errorInfo);
   };
 
   return (
@@ -83,6 +83,7 @@ const Login = () => {
             >
               {loading ? "Logging in..." : "Login"}
             </Button>
+            
           </Form.Item>
         </Form>
       </div>
