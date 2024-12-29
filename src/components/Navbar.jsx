@@ -8,7 +8,7 @@ const Navbar = () => {
       label: (
         <Link
           to="/products"
-          className="text-md font-bold text-red-700 hover:text-blue-800"
+          className="text-md font-bold"
         >
           <span className="text-PrimaryColor">PRODUCTS</span>
         </Link>
