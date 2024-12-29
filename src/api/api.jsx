@@ -50,7 +50,7 @@ export const useAllOrders = ({
   user_id,
 } = {}) => {
   const getOrders = async () => {
-    const response = await API.get("/order/all", {
+    const response = await API.get("/order/getOrders", {
       params: { page, limit, fromDate, toDate, status, user_id },
     });
     return response.data;
@@ -76,7 +76,7 @@ export const useAllOrders = ({
 // Products list
 export const useAllProduct = ({ page = 1, limit = 10 } = {}) => {
   const getAllProduct = async () => {
-    const response = await API.get("/product/all", {
+    const response = await API.get("/product/getProducts", {
       params: { page, limit },
     });
     return response.data;
