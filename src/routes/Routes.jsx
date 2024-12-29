@@ -26,6 +26,7 @@ import Test2 from "../pages/Test2";
 import Setting from "../pages/app/Setting";
 import PageManegment from "../pages/app/PageManegment";
 import Customer from "../pages/Customer";
+import PageNotFound from "../components/PageNotFound";
 
 export const router = createBrowserRouter([
   {
@@ -130,5 +131,9 @@ export const router = createBrowserRouter([
   {
     path: "/login",
     element: <Login />,
+  },
+  {
+    path: "/*",
+    element: <PageNotFound />,
   },
 ]);
