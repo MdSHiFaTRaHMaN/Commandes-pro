@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Input, Select, Button, Typography, message } from "antd";
 import { API, usePermissionRole } from "../../api/api";
+import { useNavigate } from "react-router-dom";
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -9,6 +10,7 @@ const AddNewUser = () => {
   const { permissionRole, refetch } = usePermissionRole();
   const [selectedRole, setSelectedRole] = useState(null);
   const [loading, setLoading] = useState();
+  const navigate = useNavigate();
   const handleRoleChange = (roleId) => {
     const selected = permissionRole.find((role) => role.role_id === roleId);
     setSelectedRole(selected);
@@ -28,7 +30,6 @@ const AddNewUser = () => {
 
     const newUser = { email, password, first_name, last_name, role_id };
 
-    console.log("Selected Role:", newUser);
     // You can now send the data to your API
     try {
       setLoading(true);
@@ -36,8 +37,8 @@ const AddNewUser = () => {
       if (response.status == 200) {
         message.success("Added User Successfully");
         refetch();
+        navigate("/admin-list");
       }
-      console.log(response, "resposne");
       setLoading(false);
     } catch (error) {
       console.error(error);
@@ -54,8 +55,8 @@ const AddNewUser = () => {
         </Title>
         <form onSubmit={handleNewUser}>
           <div className="mb-4">
-            <Text className="block mb-2 font-medium">Email(Username)*</Text>
-            <Input placeholder="Email" name="email" className="py-2" required/>
+            <Text className="block mb-2 font-medium">Email*</Text>
+            <Input placeholder="Email" name="email" className="py-2" required />
           </div>
           <div className="mb-4">
             <Text className="block mb-2 font-medium">Password*</Text>
@@ -77,7 +78,12 @@ const AddNewUser = () => {
           </div>
           <div className="mb-4">
             <Text className="block mb-2 font-medium">Last Name*</Text>
-            <Input placeholder="Last Name" name="last_name" className="py-2" required/>
+            <Input
+              placeholder="Last Name"
+              name="last_name"
+              className="py-2"
+              required
+            />
           </div>
           <div className="mb-4">
             <Text className="block mb-2 font-medium">Role</Text>
@@ -119,6 +125,8 @@ const AddNewUser = () => {
           </div>
           <Button
             type="primary"
+            loading={loading}
+            disabled={loading}
             htmlType="submit"
             className="w-full bg-pink-500 hover:bg-pink-600 border-none py-3"
           >

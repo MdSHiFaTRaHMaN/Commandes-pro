@@ -121,7 +121,6 @@ export const useAllCustomers = () => {
 };
 
 // Admin List
-
 export const useAdminList = () => {
   const getAdminList = async () => {
     const response = await API.get("/admins/all");
@@ -140,6 +139,27 @@ export const useAdminList = () => {
   });
 
   return { adminList, isLoading, isError, error, refetch };
+};
+
+// Single Admin
+export const useSingleAdmin = (id) => {
+  const getSingleAdmin = async () => {
+    const response = await API.get(`/admins/${id}`);
+    return response.data;
+  };
+
+  const {
+    data: admin = [],
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["admin", id],
+    queryFn: getSingleAdmin,
+  });
+
+  return { admin, isLoading, isError, error, refetch };
 };
 
 export const useAllSubCategory = () => {

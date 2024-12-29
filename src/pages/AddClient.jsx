@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { Input, Select, DatePicker, Button, message } from "antd";
 import { API } from "../api/api";
+import { useNavigate } from "react-router-dom";
 
 const { Option } = Select;
 
 const AddClient = () => {
   const [profile, setProfile] = useState("Restoration");
   const [loading, setLoading] = useState();
+  const navigate = useNavigate();
   const handleProfileChange = (value) => {
     setProfile(value);
   };
@@ -49,13 +51,13 @@ const AddClient = () => {
       taught,
       creation_date,
     };
-    console.log(data);
 
     try {
       setLoading(true);
       const response = await API.post("/user/signup", data);
       if (response.status == 200) {
         message.success("Postal Code add Successfully");
+        navigate("/customers");
       }
       console.log(response, "resposne");
       setLoading(false);
@@ -64,7 +66,6 @@ const AddClient = () => {
       message.error("Something went wrong");
       setLoading(false);
     }
-
   };
 
   return (
@@ -197,13 +198,16 @@ const AddClient = () => {
           </div>
 
           {/* Submit Button */}
-          <input
-            type="submit"
-            className="bg-PrimaryColor p-4 text-white font-semibold rounded w-full mt-5 cursor-pointer"
-          />
+          <Button
+            type="primary"
+            loading={loading}
+            disabled={loading}
+            htmlType="submit"
+            className="bg-PrimaryColor py-6 p-4 text-white font-semibold rounded w-full mt-5 cursor-pointer"
+          >
+            Submit
+          </Button>
         </form>
-
-        {/* Profile Selection */}
       </div>
     </div>
   );
