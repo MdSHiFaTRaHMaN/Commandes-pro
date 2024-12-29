@@ -8,38 +8,35 @@ import {
   notification,
 } from "antd";
 import { useNavigate, useParams } from "react-router-dom";
-import { API, useAdminList, usePermissionRole } from "../../api/api";
+import {
+  API,
+  useAdminList,
+  usePermissionRole,
+  useSingleAdmin,
+} from "../../api/api";
 import { useState, useEffect } from "react";
 
 const { Title } = Typography;
 
 const AdminEdit = () => {
   const { id } = useParams();
-  const { adminList, loading: adminLoading } = useAdminList();
+  const [editLoading, setEditLoading] = useState(false);
+  const { admin, isLoading, isError, error, refetch } = useSingleAdmin(id);
   const { permissionRole, loading: roleLoading } = usePermissionRole();
-  const navigate = useNavigate()
-
-  console.log("permissionRole", permissionRole)
-  // Safely find admin data based on the `id` parameter
-  const adminData = adminList?.find((admin) => admin.id === parseInt(id, 10));
-
-  // Debugging adminData to confirm its value
-  useEffect(() => {
-    console.log("Admin Data:", adminData);
-  }, [adminData]);
+  const navigate = useNavigate();
 
   const [selectedRole, setSelectedRole] = useState(null);
 
   const [form] = Form.useForm();
 
   useEffect(() => {
-    if (adminData) {
+    if (admin) {
       const role = permissionRole.find(
-        (role) => role.role_name === adminData.role_name
+        (role) => role.role_name === admin.role_name
       );
       setSelectedRole(role);
     }
-  }, [adminData, permissionRole]);
+  }, [admin, permissionRole]);
 
   const handleRoleChange = (roleId) => {
     const selected = permissionRole.find((role) => role.role_id === roleId);
@@ -47,16 +44,10 @@ const AdminEdit = () => {
   };
 
   const handleSubmit = async (values) => {
-    const { first_name, last_name, role } = values;
+    const { first_name, last_name } = values;
 
-    const changeRole = {
-      role_id: role, // Ensure role_id is derived correctly
-    };
-
-    console.log("Selected Role:", role);
-
-    // Validate if adminData exists
-    if (!adminData) {
+    // Validate if admin exists
+    if (!admin) {
       notification.error({
         message: "Error",
         description: "Admin data is not available.",
@@ -64,30 +55,35 @@ const AdminEdit = () => {
       return;
     }
 
-    const adminId = adminData.id;
-
     try {
+      setEditLoading(true);
       // Make the API call to update the user's role
-      await API.put(`/admins/update/role/${adminId}`, changeRole);
-       
-      // Show success notification
-      notification.success({
-        message: `Profile Updated: ${first_name} ${last_name}`,
-        description: "Your profile has been updated successfully.",
-      });
-      navigate(-1)
-    } catch (error) {
-      console.error("Error updating the user role:", error);
+      const response = await API.put(`/admins/update/${id}`, values);
 
+      if (response.status == 200) {
+        // Show success notification
+        notification.success({
+          message: `Profile Updated: ${first_name} ${last_name}`,
+          description: "Your profile has been updated successfully.",
+        });
+        navigate(-1);
+      }
+
+      setEditLoading(false);
+    } catch (error) {
+      setEditLoading(false);
+      const des =
+        error?.response?.data?.message ||
+        "An error occurred while updating the profile.";
       // Show error notification
       notification.error({
         message: "Update Failed",
-        description: "An error occurred while updating the profile.",
+        description: des,
       });
     }
   };
 
-  if (adminLoading || roleLoading) {
+  if (isLoading || roleLoading) {
     return (
       <div className="flex justify-center items-center h-screen">
         <Spin size="large" />
@@ -95,7 +91,14 @@ const AdminEdit = () => {
     );
   }
 
-  if (!adminData) {
+  if (isError)
+    return (
+      <div className="text-center text-red-500">
+        {error.message || "Something went wrong"}
+      </div>
+    );
+
+  if (!admin) {
     return (
       <div className="flex justify-center items-center h-screen">
         <p>No admin found with the specified ID.</p>
@@ -114,18 +117,23 @@ const AdminEdit = () => {
         onFinish={handleSubmit}
         className="space-y-4"
         initialValues={{
-          email: adminData.email,
-          first_name: adminData.first_name,
-          last_name: adminData.last_name,
-          role: adminData.role_name,
+          email: admin?.email,
+          first_name: admin?.first_name,
+          last_name: admin?.last_name,
+          role: admin?.role_name,
         }}
       >
         <Form.Item
-          label="Email (Username)*"
+          label="Email*"
           name="email"
+          value="vallllll"
           rules={[{ required: true, message: "Please enter the email!" }]}
         >
-          <Input placeholder="Enter email" className="rounded-md py-3" readOnly/>
+          <Input
+            placeholder="Enter email"
+            className="rounded-md py-3"
+            name="email"
+          />
         </Form.Item>
 
         <Form.Item
@@ -182,6 +190,8 @@ const AdminEdit = () => {
 
         <Form.Item>
           <Button
+            loading={editLoading}
+            disabled={editLoading}
             type="primary"
             htmlType="submit"
             className="bg-pink-500 hover:bg-pink-600 text-white w-full rounded-md"

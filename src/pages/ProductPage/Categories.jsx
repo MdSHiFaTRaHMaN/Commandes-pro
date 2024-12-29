@@ -48,6 +48,7 @@ const Categories = () => {
   const [subCategoryImage, setSubCategoryImage] = useState();
   const [subImage, setSubImage] = useState();
   const [loading, setLoading] = useState(false);
+  const [subLoading, setSubLoading] = useState(false);
   const [mainCatId, setMainCatId] = useState(null);
   const [subCategoryName, setSubCategoryName] = useState("");
   const [subCategorySerial, setSubCategorySerial] = useState();
@@ -164,7 +165,7 @@ const Categories = () => {
       };
 
       try {
-        setLoading(true); // Show loading state
+        setSubLoading(true); // Show loading state
 
         // API call to create sub-category
         const response = await API.post("/subcategory/create", subCategoryData);
@@ -179,11 +180,11 @@ const Categories = () => {
           setSubCategorySerial(null);
         }
 
-        setLoading(false); // Hide loading state
+        setSubLoading(false); // Hide loading state
       } catch (error) {
         console.error(error);
         message.error("Something went wrong");
-        setLoading(false); // Hide loading state
+        setSubLoading(false); // Hide loading state
       }
 
       // const categoryImageUrl = response?.data?.url || "";
@@ -387,12 +388,15 @@ const Categories = () => {
                   ))}
                 </Select>
 
-                <button
-                  type="submit"
-                  className="w-full p-4 bg-PrimaryColor rounded text-white font-bold text-lg"
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  loading={subLoading}
+                  disabled={subLoading}
+                  className="w-full p-4 py-7 bg-PrimaryColor rounded text-white font-bold text-lg"
                 >
                   Add to Sub-Category
-                </button>
+                </Button>
               </form>
             </div>
           </div>

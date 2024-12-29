@@ -285,10 +285,12 @@ const Products = () => {
   const handleSave = async (row) => {
     const id = row?.id;
     try {
-      const response = await API.put(`/product/update/${id}`, row);
+      const response = await API.put(`/product/upd/${id}`, row);
       if (response.status === 200) {
         message.success(`${row.name} updated successfully!`);
       }
+
+      console.log("response", response);
 
       refetch();
     } catch (error) {
