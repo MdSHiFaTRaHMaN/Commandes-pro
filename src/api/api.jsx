@@ -1,7 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { useEffect, useState } from "react";
-
 export const API = axios.create({
   baseURL: "https://grocary-ecommerce.vercel.app/api/v1",
   // baseURL: "http://localhost:5000/api/v1",
@@ -373,8 +371,6 @@ export const usePageManegment = () => {
   return { pageManegment, isLoading, isError, error, refetch };
 };
 
-// /order/all?fromDate=2024-12-25&toDate=2024-12-27
-
 export const useTodayOrder = () => {
   const getTodayOrder = async () => {
     const today = new Date().toISOString().split("T")[0];
@@ -406,11 +402,11 @@ export const useWeekOrder = () => {
     const sevenDaysAgo = new Date(today);
     sevenDaysAgo.setDate(today.getDate() - 7);
 
-    const fromDate = sevenDaysAgo.toISOString().split("T")[0]; // সাত দিন আগের তারিখ
-    const toDate = today.toISOString().split("T")[0]; // আজকের তারিখ
+    const fromDate = sevenDaysAgo.toISOString().split("T")[0]; 
+    const toDate = today.toISOString().split("T")[0];
 
     const response = await API.get(`/order/all?fromDate=${fromDate}&toDate=${toDate}`);
-    return response.data.data; // Adjust based on actual response structure
+    return response.data.data; 
   };
 
   const {
@@ -429,12 +425,10 @@ export const useWeekOrder = () => {
   return { weekOrder, isLoading, isError, error, refetch };
 };
 
-// /order/all?fromDate=2024-12-25&toDate=2024-12-27
 export const useMonthlyOrder = () => {
   const getMonthlyOrder = async () => {
     const today = new Date();
 
-    // প্রথম তারিখ নির্ধারণ (চলতি মাসের প্রথম দিন)
     const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
 
     const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
@@ -442,13 +436,12 @@ export const useMonthlyOrder = () => {
     const fromDate = firstDayOfMonth.toISOString().split("T")[0]; // চলতি মাসের প্রথম দিন
     const toDate = lastDayOfMonth.toISOString().split("T")[0]; // চলতি মাসের শেষ দিন
 
-    // API থেকে ডেটা ফেচ করা
     const response = await API.get(`/order/all?fromDate=${fromDate}&toDate=${toDate}`);
-    return response.data.data; // Adjust based on actual API response structure
+    return response.data.data;
   };
 
   const {
-    data: monthlyOrder = [], // ডিফল্ট ডেটা
+    data: monthlyOrder = [],
     isLoading,
     isError,
     error,
@@ -462,8 +455,6 @@ export const useMonthlyOrder = () => {
 
   return { monthlyOrder, isLoading, isError, error, refetch };
 };
-
-
 
 
 export const useYearOrder = () => {

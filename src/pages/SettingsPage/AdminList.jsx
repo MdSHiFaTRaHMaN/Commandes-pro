@@ -13,6 +13,8 @@ const AdminList = () => {
   const searchInput = useRef(null);
   const { adminList, refetch } = useAdminList();
 
+  
+
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
     confirm();
     setSearchText(selectedKeys[0]);
@@ -142,12 +144,6 @@ const AdminList = () => {
       ...getColumnSearchProps("name"),
     },
     {
-      title: "First Name",
-      dataIndex: "first_name",
-      key: "first_name",
-      ...getColumnSearchProps("first_name"),
-    },
-    {
       title: "Email",
       dataIndex: "email",
       key: "email",
@@ -176,7 +172,12 @@ const AdminList = () => {
             </Button>
           </Link>
           <Link>
-            <Button onClick={() => handleDelete(record.id)} type="link" className="text-red-700 text-xl" danger>
+            <Button
+              onClick={() => handleDelete(record.id)}
+              type="link"
+              className="text-red-700 text-xl"
+              danger
+            >
               <RiDeleteBin6Line />
             </Button>
           </Link>
@@ -195,8 +196,7 @@ const AdminList = () => {
       onOk: async () => {
         try {
           // API call to delete the user
-          const res =  await API.delete(`/admins/delete/${id}`);
-console.log(res)
+          await API.delete(`/admins/delete/${id}`);
 
           message.success("User deleted successfully!");
           refetch(); // Refresh the data
@@ -210,7 +210,6 @@ console.log(res)
       },
     });
   };
-  
 
   const data = adminList.map((admin) => ({
     id: admin.id,

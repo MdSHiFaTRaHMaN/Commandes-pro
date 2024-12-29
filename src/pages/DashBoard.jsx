@@ -86,7 +86,7 @@ const DashBoard = () => {
               </h3>
             </div>
           </div>
-          <div className="p-4 md:w-1/2 w-full mx-auto ">
+          <div className="p-4 md:w-1/2 w-full mx-auto "> 
             <div className="h-full bg-white p-8 rounded shadow-xl">
               <h1 className="text-2xl font-semibold">This Month</h1>
               <h3 className="text-pink-600 text-4xl font-semibold">

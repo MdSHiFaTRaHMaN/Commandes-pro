@@ -1,4 +1,3 @@
-import { DownOutlined } from "@ant-design/icons";
 import { Button, Dropdown, Space } from "antd";
 import { IoIosArrowDown } from "react-icons/io";
 import { Link } from "react-router-dom";
@@ -11,7 +10,7 @@ const Navbar = () => {
           to="/products"
           className="text-md font-bold text-red-700 hover:text-blue-800"
         >
-          PRODUCTS
+          <span className="text-PrimaryColor">PRODUCTS</span>
         </Link>
       ),
       key: "0",
@@ -22,7 +21,7 @@ const Navbar = () => {
           to="/addtoproduct"
           className="text-md font-bold text-red-700 hover:text-red-800"
         >
-          ADD NEW PRODUCT
+          <span className="text-PrimaryColor">ADD NEW PRODUCT</span>
         </Link>
       ),
       key: "1",
@@ -33,7 +32,7 @@ const Navbar = () => {
           to="/categorics"
           className="text-md font-bold text-red-700 hover:text-blue-800"
         >
-          CATEGORICS
+          <span className="text-PrimaryColor">CATEGORICS</span>
         </Link>
       ),
       key: "2",
@@ -86,13 +85,11 @@ const Navbar = () => {
     {
       label: (
         <Link to="/update-password">
-          <span className="text-md font-bold text-PrimaryColor">
-            SETTING
-          </span>
+          <span className="text-md font-bold text-PrimaryColor">SETTING</span>
         </Link>
       ),
       key: "1",
-    }
+    },
   ];
   return (
     <nav className="bg-[#e24c80] shadow ">
@@ -187,7 +184,7 @@ const Navbar = () => {
                 </a>
               </Dropdown>
               <Dropdown
-              className="ml-4"
+                className="ml-4"
                 menu={{
                   items: app,
                 }}

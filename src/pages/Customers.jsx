@@ -61,7 +61,7 @@ const Customers = () => {
           // Call the API to delete the user
           await API.delete(`/user/delete/${id}`);
           message.success("User deleted successfully!");
-          // Optionally refresh your data here
+          refetch();
         } catch (error) {
           console.error("Error deleting user:", error);
           message.error("Failed to delete the user. Please try again.");
