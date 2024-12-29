@@ -50,7 +50,7 @@ export const useAllOrders = ({
   user_id,
 } = {}) => {
   const getOrders = async () => {
-    const response = await API.get("/order/all", {
+    const response = await API.get("/order/getOrders", {
       params: { page, limit, fromDate, toDate, status, user_id },
     });
     return response.data;
@@ -76,7 +76,7 @@ export const useAllOrders = ({
 // Products list
 export const useAllProduct = ({ page = 1, limit = 10 } = {}) => {
   const getAllProduct = async () => {
-    const response = await API.get("/product/all", {
+    const response = await API.get("/product/getProducts", {
       params: { page, limit },
     });
     return response.data;
@@ -121,7 +121,6 @@ export const useAllCustomers = () => {
 };
 
 // Admin List
-
 export const useAdminList = () => {
   const getAdminList = async () => {
     const response = await API.get("/admins/all");
@@ -140,6 +139,27 @@ export const useAdminList = () => {
   });
 
   return { adminList, isLoading, isError, error, refetch };
+};
+
+// Single Admin
+export const useSingleAdmin = (id) => {
+  const getSingleAdmin = async () => {
+    const response = await API.get(`/admins/${id}`);
+    return response.data;
+  };
+
+  const {
+    data: admin = [],
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["admin", id],
+    queryFn: getSingleAdmin,
+  });
+
+  return { admin, isLoading, isError, error, refetch };
 };
 
 export const useAllSubCategory = () => {

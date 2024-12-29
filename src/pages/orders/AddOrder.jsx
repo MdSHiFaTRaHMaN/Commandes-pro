@@ -368,10 +368,12 @@ const AddOrder = () => {
               Select Delivery Address
             </Text>
 
-            <AddAddressModel
-              selectCustomer={selectedCustomer}
-              refetch={refetch}
-            />
+            <div className="cursor-pointer">
+              <AddAddressModel
+                selectCustomer={selectedCustomer}
+                refetch={refetch}
+              />
+            </div>
           </div>
 
           <Select

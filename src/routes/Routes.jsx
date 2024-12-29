@@ -6,14 +6,12 @@ import PrivateRoute from "./PrivateRoute";
 import Products from "../pages/ProductPage/Products";
 import AddNewProduct from "../pages/ProductPage/AddNewProduct";
 import Categories from "../pages/ProductPage/Categories";
-import Customers from "../pages/Customers";
 import AdminList from "../pages/SettingsPage/AdminList";
 import Orders from "../pages/orders/Orders";
 import Test from "../pages/Test";
 import AdminEdit from "../pages/SettingsPage/AdminEdit";
 import AdminProfile from "../pages/AdminProfile";
 import EditProduct from "../pages/ProductPage/EditProduct";
-import InvoiceOrder from "../pages/orders/InvoiceOrder";
 import AddNewUser from "../pages/SettingsPage/AddNewUser";
 import AddOrder from "../pages/orders/AddOrder";
 import EditOrder from "../pages/orders/EditOrder";
@@ -27,6 +25,8 @@ import Test2 from "../pages/Test2";
 
 import Setting from "../pages/app/Setting";
 import PageManegment from "../pages/app/PageManegment";
+import Customer from "../pages/Customer";
+import PageNotFound from "../components/PageNotFound";
 
 export const router = createBrowserRouter([
   {
@@ -73,9 +73,10 @@ export const router = createBrowserRouter([
         path: "/categorics",
         element: <Categories />,
       },
+
       {
         path: "/customers",
-        element: <Customers />,
+        element: <Customer />,
       },
       {
         path: "/admin-list",
@@ -130,5 +131,9 @@ export const router = createBrowserRouter([
   {
     path: "/login",
     element: <Login />,
+  },
+  {
+    path: "/*",
+    element: <PageNotFound />,
   },
 ]);

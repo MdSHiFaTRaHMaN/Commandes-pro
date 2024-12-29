@@ -7,8 +7,6 @@ const AddAddressModel = ({ selectCustomer, refetch }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [addressLoading, setAddressLoading] = useState(false);
 
-  console.log("haaa etai", selectCustomer);
-
   // open modal
   const showModal = () => {
     setIsModalOpen(true);
@@ -122,7 +120,13 @@ const AddAddressModel = ({ selectCustomer, refetch }) => {
           </Form.Item>
 
           <Form.Item>
-            <Button type="primary" htmlType="submit" className="w-full">
+            <Button
+              type="primary"
+              loading={addressLoading}
+              disabled={addressLoading}
+              htmlType="submit"
+              className="w-full"
+            >
               Submit
             </Button>
           </Form.Item>
