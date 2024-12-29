@@ -1,7 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { useEffect, useState } from "react";
-
 export const API = axios.create({
   baseURL: "https://grocary-ecommerce.vercel.app/api/v1",
   // baseURL: "http://localhost:5000/api/v1",
@@ -101,72 +99,47 @@ export const useAllProduct = ({ page = 1, limit = 10 } = {}) => {
   return { allProduct, pagination, isLoading, isError, error, refetch };
 };
 
-// All user show
+// all customer list
 export const useAllCustomers = () => {
-  const getCustomer = async () => {
-    try {
-      const response = await API.get("/user/all?page=1&limit=10");
-      return response.data.data;
-    } catch (error) {
-      console.error("Error fetching AllCustomer:", error);
-      throw error;
-    }
+  const getAllCustomer = async () => {
+    const response = await API.get("/user/all?page=1&limit=10");
+    return response.data.data;
   };
 
-  const [allCustomer, setAllCustomer] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const {
+    data: allCustomer = [],
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["allCustomer"],
+    queryFn: getAllCustomer,
+  });
 
-  useEffect(() => {
-    const fetchAllCustomer = async () => {
-      try {
-        const customerData = await getCustomer();
-        setAllCustomer(customerData);
-      } catch (error) {
-        setError("Failed to fetch all Customer.", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAllCustomer();
-  }, []);
-
-  return { allCustomer, loading, error };
+  return { allCustomer, isLoading, isError, error, refetch };
 };
 
 // Admin List
+
 export const useAdminList = () => {
-  const getAdmin = async () => {
-    try {
-      const response = await API.get("/admins/all");
-      return response.data.data;
-    } catch (error) {
-      console.error("Error fetching Admin:", error);
-      throw error;
-    }
+  const getAdminList = async () => {
+    const response = await API.get("/admins/all");
+    return response.data.data;
   };
 
-  const [adminList, setAdminList] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const {
+    data: adminList = [],
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["adminList"],
+    queryFn: getAdminList,
+  });
 
-  useEffect(() => {
-    const fetchAllAdmin = async () => {
-      try {
-        const adminData = await getAdmin();
-        setAdminList(adminData);
-      } catch (error) {
-        setError("Failed to fetch all Admin.", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAllAdmin();
-  }, []);
-
-  return { adminList, loading, error };
+  return { adminList, isLoading, isError, error, refetch };
 };
 
 export const useAllSubCategory = () => {
@@ -449,4 +422,171 @@ export const useMultipleOrder = (data) => {
     queryFn: getMultipleOrder,
   });
   return { multipleOrder, isLoading, isError, error, refetch };
+};
+
+// get category with sub
+export const useCategoryWithSub = () => {
+  const getCategoryWithSub = async () => {
+    const response = await API.get("/category");
+    return response.data.data;
+  };
+
+  const {
+    data: categoryWithSub = [],
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["categoryWithSub"],
+    queryFn: getCategoryWithSub,
+  });
+
+  return { categoryWithSub, isLoading, isError, error, refetch };
+};
+// get category with sub
+export const usePageManegment = () => {
+  const getPageManegment = async () => {
+    const response = await API.get("/settings/privacy");
+    return response.data.data;
+  };
+
+  const {
+    data: pageManegment = [],
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["PageManegment"],
+    queryFn: getPageManegment,
+  });
+
+  return { pageManegment, isLoading, isError, error, refetch };
+};
+
+export const useTodayOrder = () => {
+  const getTodayOrder = async () => {
+    const today = new Date().toISOString().split("T")[0];
+
+    const response = await API.get(
+      `/order/all?fromDate=${today}&toDate=${today}`
+    );
+    return response.data.data; // Adjust based on actual response
+  };
+
+  const {
+    data: todayOrder = [],
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["todayOrder", new Date().toISOString().split("T")[0]],
+    queryFn: getTodayOrder,
+    onError: (error) => console.error("Query Error:", error),
+    onSuccess: (data) => console.log("Query Success:", data),
+  });
+
+  return { todayOrder, isLoading, isError, error, refetch };
+};
+
+export const useWeekOrder = () => {
+  const getWeekOrder = async () => {
+    const today = new Date();
+    const sevenDaysAgo = new Date(today);
+    sevenDaysAgo.setDate(today.getDate() - 7);
+
+    const fromDate = sevenDaysAgo.toISOString().split("T")[0];
+    const toDate = today.toISOString().split("T")[0];
+
+    const response = await API.get(
+      `/order/all?fromDate=${fromDate}&toDate=${toDate}`
+    );
+    return response.data.data;
+  };
+
+  const {
+    data: weekOrder = [],
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["weekOrder", new Date().toISOString().split("T")[0]], // কুইরির জন্য ডাইনামিক কী
+    queryFn: getWeekOrder,
+    onError: (error) => console.error("Query Error:", error),
+    onSuccess: (data) => console.log("Query Success:", data),
+  });
+
+  return { weekOrder, isLoading, isError, error, refetch };
+};
+
+export const useMonthlyOrder = () => {
+  const getMonthlyOrder = async () => {
+    const today = new Date();
+
+    const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+
+    const lastDayOfMonth = new Date(
+      today.getFullYear(),
+      today.getMonth() + 1,
+      0
+    );
+
+    const fromDate = firstDayOfMonth.toISOString().split("T")[0]; // চলতি মাসের প্রথম দিন
+    const toDate = lastDayOfMonth.toISOString().split("T")[0]; // চলতি মাসের শেষ দিন
+
+    const response = await API.get(
+      `/order/all?fromDate=${fromDate}&toDate=${toDate}`
+    );
+    return response.data.data;
+  };
+
+  const {
+    data: monthlyOrder = [],
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["monthlyOrder", new Date().toISOString().split("T")[0]], // কুইরি কী
+    queryFn: getMonthlyOrder,
+    onError: (error) => console.error("Query Error:", error),
+    onSuccess: (data) => console.log("Query Success:", data),
+  });
+
+  return { monthlyOrder, isLoading, isError, error, refetch };
+};
+
+export const useYearOrder = () => {
+  const getYearOrder = async () => {
+    const today = new Date();
+
+    // চলতি বছরের শুরু এবং শেষ তারিখ বের করা
+    const currentYear = today.getFullYear();
+    const fromDate = `${currentYear}-01-01`;
+    const toDate = today.toISOString().split("T")[0];
+
+    // API থেকে ডেটা ফেচ করা
+    const response = await API.get(
+      `/order/all?fromDate=${fromDate}&toDate=${toDate}`
+    );
+    return response.data.data;
+  };
+
+  const {
+    data: yearOrder = [],
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["yearOrder", new Date().toISOString().split("T")[0]], // ডাইনামিক কুইরি কী
+    queryFn: getYearOrder,
+    onError: (error) => console.error("Query Error:", error),
+    onSuccess: (data) => console.log("Query Success:", data),
+  });
+
+  return { yearOrder, isLoading, isError, error, refetch };
 };

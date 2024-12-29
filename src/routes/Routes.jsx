@@ -25,6 +25,9 @@ import MultiOrderInvoice from "../pages/orders/MultiOrderInvoice";
 import InvoiceGenerator from "../pages/invoiceGenerator/InvoiceGenerator";
 import Test2 from "../pages/Test2";
 
+import Setting from "../pages/app/Setting";
+import PageManegment from "../pages/app/PageManegment";
+
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -105,6 +108,14 @@ export const router = createBrowserRouter([
       {
         path: "/order-invoice/:orderId",
         element: <OrderInvoice />,
+      },
+      {
+        path: "/update-password",
+        element: <Setting />,
+      },
+      {
+        path: "/page-manegment",
+        element: <PageManegment />,
       },
       {
         path: "/multi-invoice",

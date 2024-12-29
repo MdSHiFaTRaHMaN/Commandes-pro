@@ -175,7 +175,6 @@ const OrderList = ({ order, refetch }) => {
   });
 
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
-  const [loading, setLoading] = useState(false);
 
   const onSelectedData = async (value) => {
     const query = new URLSearchParams({
@@ -205,7 +204,6 @@ const OrderList = ({ order, refetch }) => {
       <div className="text-center mt-[-40px]">
         <Button
           onClick={() => onSelectedData(selectedRowKeys)}
-          loading={loading}
           disabled={!hasSelected}
           type="primary"
           onMouseEnter={(e) => (e.target.style.backgroundColor = "#f54080")}
