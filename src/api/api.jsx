@@ -49,10 +49,11 @@ export const useAllOrders = ({
   fromDate,
   toDate,
   status,
+  user_id,
 } = {}) => {
   const getOrders = async () => {
     const response = await API.get("/order/all", {
-      params: { page, limit, fromDate, toDate, status },
+      params: { page, limit, fromDate, toDate, status, user_id },
     });
     return response.data;
   };
@@ -64,7 +65,7 @@ export const useAllOrders = ({
     error,
     refetch,
   } = useQuery({
-    queryKey: ["order", page, limit, fromDate, toDate, status],
+    queryKey: ["order", page, limit, fromDate, toDate, status, user_id],
     queryFn: getOrders,
     keepPreviousData: true,
   });
@@ -426,4 +427,26 @@ export const usePermissionRole = () => {
   });
 
   return { permissionRole, isLoading, isError, error, refetch };
+};
+
+// get multiple order
+export const useMultipleOrder = (data) => {
+  const getMultipleOrder = async () => {
+    console.log(data);
+    const response = await API.get("/order/array", {
+      params: { ordersID: data },
+    });
+    return response.data;
+  };
+  const {
+    data: multipleOrder = [],
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["multipleOrder", data],
+    queryFn: getMultipleOrder,
+  });
+  return { multipleOrder, isLoading, isError, error, refetch };
 };

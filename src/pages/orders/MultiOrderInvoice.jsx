@@ -1,50 +1,90 @@
-import { Button } from "antd";
+import React, { useRef, useState } from "react";
+import { Button, Spin } from "antd";
 import { PrinterOutlined } from "@ant-design/icons";
-
-
+import { useLocation } from "react-router-dom";
+import logoImage from "../../assets/images/LOGO-COMMANDES-PRO.png";
+import { useMultipleOrder } from "../../api/api";
+import html2pdf from "html2pdf.js";
 
 function MultiOrderInvoice() {
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const data = queryParams.get("data")
+    ? JSON.parse(queryParams.get("data"))
+    : [];
+  const invoiceRef = useRef(); // Reference to the invoice container
 
+  const { multipleOrder, isLoading, isError, error, refetch } =
+    useMultipleOrder(data);
 
+  if (isLoading) return <Spin size="large" className="block mx-auto my-10" />;
+  if (isError)
+    return (
+      <div className="text-center text-red-500">
+        {error.message || "Something went wrong"}
+      </div>
+    );
 
+  const today = new Date();
+  const options = {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  };
+  const formattedDate = today.toLocaleDateString("en-US", options);
 
- 
+  const totalPrice = multipleOrder.allProducts.reduce(
+    (acc, product) => acc + product.price * product.quantity,
+    0
+  );
+
+  const printInvoice = () => {
+    const element = invoiceRef.current;
+
+    html2pdf()
+      .set({
+        margin: 1,
+        filename: "invoice.pdf",
+        image: { type: "jpeg", quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: "in", format: "a4", orientation: "portrait" },
+      })
+      .from(element)
+      .toPdf()
+      .get("pdf")
+      .then((pdf) => {
+        pdf.autoPrint();
+        const pdfData = pdf.output("dataurlstring");
+        const iframe = document.createElement("iframe");
+        iframe.style.position = "fixed";
+        iframe.style.width = "0px";
+        iframe.style.height = "0px";
+        iframe.style.border = "none";
+        iframe.src = pdfData;
+        document.body.appendChild(iframe);
+        iframe.onload = () => {
+          iframe.contentWindow.print();
+        };
+      });
+  };
 
   return (
-    <div className="w-3/5 mx-auto mt-5 p-6 bg-white border border-gray-200 rounded-lg shadow-md">
-      <div id="content" >
-        {/* Header Section */}
-        <div className="flex flex-wrap justify-between">
-          <div className="text-">
-            <h1 className="my-6 text-2xl font-semibold">CommandesPro</h1>
-            <p>10, rue de la Chicane</p>
-            <p>59620 Villeneuve Ascq</p>
-            <p>Tel.: 01 23 45 67 89</p>
-            <p>Email: contact@commandespros.com</p>
-          </div>
-          <div className="text-right mt-4 md:mt-0">
-            <p>Invoice No: </p>
-            <p>Invoice Date: </p>
-            <p>Order No: </p>
-            <p>Order Date: </p>
-          </div>
+    <div className="w-full max-w-5xl mx-auto mt-5 p-6 bg-white border border-gray-200 rounded-lg shadow-md">
+      <div id="content" ref={invoiceRef}>
+        <div>
+          <h1 className="text-center  text-4xl font-bold">
+            <span className="text-PrimaryColor">Commandes </span>
+            Pros
+          </h1>
+          <h2 className="text-4xl font-semibold text-PrimaryColor">
+            Préparation des Commandes du jour
+          </h2>
+
+          <p className="text-xl font-semibold">Invoice Date: {formattedDate}</p>
         </div>
-        {/* Billing and Delivery Address Section */}
-        <div className="flex justify-between gap-6 mt-6">
-          <div>
-            <h2 className="font-bold">Billing Address:</h2>
-            <p></p>
-          </div>
-          <div>
-            <h2 className="font-bold">Delivery Address:</h2>
-            <p>Contact: </p>
-            <p>Phone: </p>
-            <p>Address: </p>
-            <p>City:</p>
-            <p>Post Code: </p>
-          </div>
-        </div>
+
         {/* Products Table */}
+
         <div className="mt-8 overflow-x-auto">
           <table className="w-full border-collapse border border-gray-300 text-sm">
             <thead className="bg-PrimaryColor text-white">
@@ -59,8 +99,8 @@ function MultiOrderInvoice() {
                 </th>
               </tr>
             </thead>
-            {/* <tbody>
-              {products.map((product, index) => (
+            <tbody>
+              {multipleOrder.allProducts.map((product, index) => (
                 <tr key={index}>
                   <td className="border border-gray-300 p-2">
                     {product.name || `Product ${product.product_id}`}
@@ -76,23 +116,16 @@ function MultiOrderInvoice() {
                   </td>
                 </tr>
               ))}
-            </tbody> */}
+            </tbody>
           </table>
         </div>
+
         {/* Summary Section */}
         <div className="flex justify-end mt-8">
           <div className="w-full md:w-1/3">
-            <p className="flex justify-between">
-              <span>Subtotal (excl. tax):</span>
-              <span>Sub total €</span>
-            </p>
-            <p className="flex justify-between">
-              <span>VAT Amount:</span>
-              <span>Tex am €</span>
-            </p>
             <p className="flex justify-between font-bold">
               <span>Total (incl. VAT):</span>
-              <span>total €</span>
+              <span>{totalPrice.toFixed(2)} €</span>
             </p>
           </div>
         </div>
@@ -101,6 +134,7 @@ function MultiOrderInvoice() {
       <Button
         type="default"
         className="text-white bg-PrimaryColor p-5 font-semibold mt-6"
+        onClick={printInvoice}
       >
         <PrinterOutlined /> Multiple Print Invoice
       </Button>

@@ -22,6 +22,8 @@ import PostalCode from "../pages/SettingsPage/PostalCode";
 import AddClient from "../pages/AddClient";
 import OrderInvoice from "../pages/orders/OrderInvoice";
 import MultiOrderInvoice from "../pages/orders/MultiOrderInvoice";
+import InvoiceGenerator from "../pages/invoiceGenerator/InvoiceGenerator";
+import Test2 from "../pages/Test2";
 
 export const router = createBrowserRouter([
   {
@@ -57,6 +59,10 @@ export const router = createBrowserRouter([
         element: <Test />,
       },
       {
+        path: "/test2",
+        element: <Test2 />,
+      },
+      {
         path: "/addtoproduct",
         element: <AddNewProduct />,
       },
@@ -90,20 +96,24 @@ export const router = createBrowserRouter([
       },
       {
         path: "/postal-code",
-        element: <PostalCode />
+        element: <PostalCode />,
       },
       {
         path: "/add-customer",
-        element: <AddClient />
+        element: <AddClient />,
       },
       {
         path: "/order-invoice/:orderId",
-        element: <OrderInvoice />
+        element: <OrderInvoice />,
       },
       {
         path: "/multi-invoice",
-        element: <MultiOrderInvoice />
-      }
+        element: <MultiOrderInvoice />,
+      },
+      {
+        path: "/invoice",
+        element: <InvoiceGenerator />,
+      },
     ],
   },
   {

@@ -144,12 +144,13 @@ const Navbar = () => {
               >
                 Orders
               </Link>
-              <a
-                href="#"
+              <Link
+                to="/invoice"
                 className="mt-2 transition-colors duration-300 transform lg:mt-0 lg:mx-4 hover:text-gray-900"
               >
                 Invoices
-              </a>
+              </Link>
+
               <a
                 href="#"
                 className="mt-2 transition-colors duration-300 transform lg:mt-0 lg:mx-4 hover:text-gray-900"
