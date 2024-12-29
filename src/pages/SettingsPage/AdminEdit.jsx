@@ -7,7 +7,7 @@ import {
   Spin,
   notification,
 } from "antd";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { API, useAdminList, usePermissionRole } from "../../api/api";
 import { useState, useEffect } from "react";
 
@@ -17,10 +17,18 @@ const AdminEdit = () => {
   const { id } = useParams();
   const { adminList, loading: adminLoading } = useAdminList();
   const { permissionRole, loading: roleLoading } = usePermissionRole();
+  const navigate = useNavigate()
 
-  const adminData = adminList?.find((admin) => admin.id === parseInt(id));
+  console.log("permissionRole", permissionRole)
+  // Safely find admin data based on the `id` parameter
+  const adminData = adminList?.find((admin) => admin.id === parseInt(id, 10));
+
+  // Debugging adminData to confirm its value
+  useEffect(() => {
+    console.log("Admin Data:", adminData);
+  }, [adminData]);
+
   const [selectedRole, setSelectedRole] = useState(null);
-  const [selectId, setSelectId] = useState()
 
   const [form] = Form.useForm();
 
@@ -34,20 +42,49 @@ const AdminEdit = () => {
   }, [adminData, permissionRole]);
 
   const handleRoleChange = (roleId) => {
-    setSelectId(roleId)
     const selected = permissionRole.find((role) => role.role_id === roleId);
     setSelectedRole(selected);
   };
 
   const handleSubmit = async (values) => {
-    const { first_name, last_name } = values;
+    const { first_name, last_name, role } = values;
 
-    
+    const changeRole = {
+      role_id: role, // Ensure role_id is derived correctly
+    };
 
-    notification.success({
-      message: `Profile Updated: ${first_name} ${last_name}`,
-      description: "Your profile has been updated successfully.",
-    });
+    console.log("Selected Role:", role);
+
+    // Validate if adminData exists
+    if (!adminData) {
+      notification.error({
+        message: "Error",
+        description: "Admin data is not available.",
+      });
+      return;
+    }
+
+    const adminId = adminData.id;
+
+    try {
+      // Make the API call to update the user's role
+      await API.put(`/admins/update/role/${adminId}`, changeRole);
+       
+      // Show success notification
+      notification.success({
+        message: `Profile Updated: ${first_name} ${last_name}`,
+        description: "Your profile has been updated successfully.",
+      });
+      navigate(-1)
+    } catch (error) {
+      console.error("Error updating the user role:", error);
+
+      // Show error notification
+      notification.error({
+        message: "Update Failed",
+        description: "An error occurred while updating the profile.",
+      });
+    }
   };
 
   if (adminLoading || roleLoading) {
@@ -88,7 +125,7 @@ const AdminEdit = () => {
           name="email"
           rules={[{ required: true, message: "Please enter the email!" }]}
         >
-          <Input placeholder="Enter email" className="rounded-md" />
+          <Input placeholder="Enter email" className="rounded-md py-3" readOnly/>
         </Form.Item>
 
         <Form.Item
@@ -96,7 +133,7 @@ const AdminEdit = () => {
           name="first_name"
           rules={[{ required: true, message: "Please enter the first name!" }]}
         >
-          <Input placeholder="Enter first name" className="rounded-md" />
+          <Input placeholder="Enter first name" className="rounded-md py-3" />
         </Form.Item>
 
         <Form.Item
@@ -104,7 +141,7 @@ const AdminEdit = () => {
           name="last_name"
           rules={[{ required: true, message: "Please enter the last name!" }]}
         >
-          <Input placeholder="Enter last name" className="rounded-md" />
+          <Input placeholder="Enter last name" className="rounded-md py-3" />
         </Form.Item>
 
         <Form.Item
@@ -113,7 +150,7 @@ const AdminEdit = () => {
           rules={[{ required: true, message: "Please select a role!" }]}
         >
           <Select
-            className="rounded-md"
+            className="rounded-md h-11"
             onChange={handleRoleChange}
             placeholder="Select a role"
           >

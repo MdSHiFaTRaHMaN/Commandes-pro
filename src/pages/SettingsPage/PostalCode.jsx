@@ -1,8 +1,7 @@
 import React, { useState } from "react";
-import { Button, Input, Popconfirm, Table, Spin, Alert, message, Modal } from "antd";
+import { Button, Input, Table, Spin, Alert, message, Modal } from "antd";
 import "antd/dist/reset.css";
 import { API, usePostalCode } from "../../api/api";
-import { RiDeleteBinFill } from "react-icons/ri";
 import { FaTrashAlt } from "react-icons/fa";
 
 const PostalCode = () => {
@@ -13,7 +12,7 @@ const PostalCode = () => {
   
   const handleDelete = async (id) => {
     Modal.confirm({
-      title: "Are you sure you want to delete this user?",
+      title: "Are you sure you want to delete this Postal Code?",
       content: "This action cannot be undone.",
       okText: "Yes, Delete",
       cancelText: "Cancel",

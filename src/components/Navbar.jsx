@@ -1,5 +1,5 @@
-import { DownOutlined } from "@ant-design/icons";
 import { Button, Dropdown, Space } from "antd";
+import { IoIosArrowDown } from "react-icons/io";
 import { Link } from "react-router-dom";
 
 const Navbar = () => {
@@ -8,9 +8,9 @@ const Navbar = () => {
       label: (
         <Link
           to="/products"
-          className="text-md font-bold text-red-700 hover:text-blue-800"
+          className="text-md font-bold"
         >
-          PRODUCTS
+          <span className="text-PrimaryColor">PRODUCTS</span>
         </Link>
       ),
       key: "0",
@@ -21,7 +21,7 @@ const Navbar = () => {
           to="/addtoproduct"
           className="text-md font-bold text-red-700 hover:text-red-800"
         >
-          ADD NEW PRODUCT
+          <span className="text-PrimaryColor">ADD NEW PRODUCT</span>
         </Link>
       ),
       key: "1",
@@ -32,7 +32,7 @@ const Navbar = () => {
           to="/categorics"
           className="text-md font-bold text-red-700 hover:text-blue-800"
         >
-          CATEGORICS
+          <span className="text-PrimaryColor">CATEGORICS</span>
         </Link>
       ),
       key: "2",
@@ -42,44 +42,53 @@ const Navbar = () => {
   const settingNav = [
     {
       label: (
-        <Link
-          to="admin-list"
-          className="text-lg font-semibold text-red-700 hover:text-blue-800"
-        >
-          Users list
+        <Link to="admin-list">
+          <span className="text-md font-bold text-PrimaryColor">
+            ADMIN LIST
+          </span>
         </Link>
       ),
       key: "0",
     },
     {
       label: (
-        <Link
-          to="/add-new-user"
-          className="text-lg font-semibold text-red-700 hover:text-red-800"
-        >
-          Add New User
+        <Link to="/add-new-user">
+          <span className="text-md font-bold text-PrimaryColor">
+            ADD NEW USER
+          </span>
         </Link>
       ),
       key: "1",
     },
     {
       label: (
-        <a className="text-lg font-semibold text-red-700 hover:text-blue-800">
-          App
-        </a>
+        <Link to="/postal-code">
+          <span className="text-md font-bold text-PrimaryColor">
+            POSTAL CODE
+          </span>
+        </Link>
       ),
       key: "2",
     },
+  ];
+  const app = [
     {
       label: (
-        <Link
-          to="/postal-code"
-          className="text-lg font-semibold text-red-700 hover:text-blue-800"
-        >
-          Postal Code
+        <Link to="page-manegment">
+          <span className="text-md font-bold text-PrimaryColor">
+            PAGE MANEGMENT
+          </span>
         </Link>
       ),
-      key: "3",
+      key: "0",
+    },
+    {
+      label: (
+        <Link to="/update-password">
+          <span className="text-md font-bold text-PrimaryColor">SETTING</span>
+        </Link>
+      ),
+      key: "1",
     },
   ];
   return (
@@ -133,7 +142,7 @@ const Navbar = () => {
                 <a onClick={(e) => e.preventDefault()}>
                   <Space>
                     Products
-                    <DownOutlined />
+                    <IoIosArrowDown />
                   </Space>
                 </a>
               </Dropdown>
@@ -144,12 +153,13 @@ const Navbar = () => {
               >
                 Orders
               </Link>
-              <a
-                href="#"
+              <Link
+                to="/invoice"
                 className="mt-2 transition-colors duration-300 transform lg:mt-0 lg:mx-4 hover:text-gray-900"
               >
                 Invoices
-              </a>
+              </Link>
+
               <a
                 href="#"
                 className="mt-2 transition-colors duration-300 transform lg:mt-0 lg:mx-4 hover:text-gray-900"
@@ -170,7 +180,20 @@ const Navbar = () => {
                 <a>
                   <Space>
                     Settings
-                    <DownOutlined />
+                    <IoIosArrowDown />
+                  </Space>
+                </a>
+              </Dropdown>
+              <Dropdown
+                className="ml-4"
+                menu={{
+                  items: app,
+                }}
+              >
+                <a>
+                  <Space>
+                    APP
+                    <IoIosArrowDown />
                   </Space>
                 </a>
               </Dropdown>
