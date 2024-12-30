@@ -322,7 +322,6 @@ export const useProductName = () => {
 
 export const useDeliveryAddress = (orderId) => {
   const getSingleOrder = async () => {
-    console.log(orderId);
     const response = await API.get("");
     return response.data.order;
   };

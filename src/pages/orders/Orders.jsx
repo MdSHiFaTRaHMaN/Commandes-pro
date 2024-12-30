@@ -126,7 +126,7 @@ const Orders = () => {
 
   const onDateChange = async (id, date, dateString) => {
     try {
-      const response = await API.put(`/order/update-price/${id}`, {
+      const response = await API.put(`/order/update/${id}`, {
         delivery_date: dateString,
       });
 
@@ -231,7 +231,7 @@ const Orders = () => {
   const handleSave = async (row) => {
     const id = row?.id;
     try {
-      const response = await API.put(`/order/update-price/${id}`, row);
+      const response = await API.put(`/order/update/${id}`, row);
       if (response.status === 200) {
         message.success(`${row.company} updated successfully!`);
       }
