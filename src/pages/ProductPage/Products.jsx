@@ -169,44 +169,60 @@ const Products = () => {
       title: "PRODUITS",
       dataIndex: "name",
       editable: true,
+      width: "100%",
     },
+
     {
       title: "PRIX D'ACHAT",
       dataIndex: "purchase_price",
-      render: (_, record) => `${record.purchase_price} €`,
+      render: (_, record) => `${record.purchase_price.toFixed(2)}€`,
       editable: true,
     },
-
+    {
+      title: "Restauration",
+      dataIndex: "regular_price",
+      render: (_, record) => `${record.regular_price.toFixed(2)}€`,
+      editable: true,
+    },
+    {
+      title: "Revendeur",
+      dataIndex: "selling_price",
+      render: (_, record) => `${record.selling_price.toFixed(2)}€`,
+      editable: true,
+    },
+    {
+      title: "Grossiste",
+      dataIndex: "whole_price",
+      render: (_, record) => `${record.whole_price.toFixed(2)}€`,
+      editable: true,
+    },
+    {
+      title: "UV",
+      dataIndex: "supper_marcent",
+      render: (_, record) => `${record.supper_marcent.toFixed(2)}€`,
+      editable: true,
+    },
     {
       title: "UNITÉS",
       dataIndex: "unit",
       key: "unit",
-      width: "5%",
       render: (_, record) => (
         <Select
           value={record?.unit}
           onChange={(value) => handleStatusChange(record.id, "unit", value)}
-          style={{ width: 125 }}
           options={[
-            { value: "KG (€ / KG)", label: "KG (€ / KG)" },
-            { value: "G (€ / G)", label: "G (€ / G)" },
-            { value: "MG (€ / MG)", label: "MG (€ / MG)" },
-            { value: "L (€ / L)", label: "L (€ / L)" },
-            { value: "ML (€ / ML)", label: "ML (€ / ML)" },
-            { value: "U (€ / U)", label: "U (€ / U)" },
-            { value: "CM (€ / CM)", label: "CM (€ / CM)" },
-            { value: "MM (€ / MM)", label: "MM (€ / MM)" },
-            { value: "M (€ / M)", label: "M (€ / M)" },
+            { value: "KG (€/KG)", label: "KG (€/KG)" },
+            { value: "G (€/G)", label: "G (€/G)" },
+            { value: "MG (€/MG)", label: "MG (€/MG)" },
+            { value: "L (€/L)", label: "L (€/L)" },
+            { value: "ML (€/ML)", label: "ML (€/ML)" },
+            { value: "U (€/U)", label: "U (€/U)" },
+            { value: "CM (€/CM)", label: "CM (€/CM)" },
+            { value: "MM (€/MM)", label: "MM (€/MM)" },
+            { value: "M (€/M)", label: "M (€/M)" },
           ]}
         />
       ),
-    },
-
-    {
-      title: "UV",
-      dataIndex: "supper_marcent",
-      render: (_, record) => `${record.supper_marcent} €`,
-      editable: true,
     },
     {
       title: "STOCK",
@@ -214,7 +230,6 @@ const Products = () => {
       render: (_, record) => (
         <Select
           value={record?.is_stock == 1 ? "In Stock" : "Out of Stock"}
-          style={{ width: 100 }}
           onChange={(value) => handleStatusChange(record.id, "is_stock", value)}
           options={[
             { value: true, label: "In Stock" },
@@ -235,7 +250,6 @@ const Products = () => {
           optionFilterProp="label"
           value={record?.country}
           onChange={(value) => handleStatusChange(record.id, "country", value)}
-          style={{ width: 180 }}
           options={countries.map((country) => ({
             value: country.name,
             label: country.name,
@@ -250,7 +264,6 @@ const Products = () => {
       render: (_, record) => (
         <Select
           value={record?.status}
-          style={{ width: 100 }}
           onChange={(value) => handleStatusChange(record.id, "status", value)}
           options={[
             { value: "active", label: "active" },
@@ -329,7 +342,7 @@ const Products = () => {
     );
 
   return (
-    <div className="mx-24 my-5 border-shadow">
+    <div className="mx-4 my-5 border-shadow">
       <div className="flex justify-between mx-6 mb-5">
         <div className="text-3xl font-bold text-[#e24c80]">
           Liste des Produits
