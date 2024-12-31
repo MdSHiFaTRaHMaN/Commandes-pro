@@ -125,7 +125,7 @@ export const router = createBrowserRouter([
       {
         path: "/invoice",
         element: <InvoiceGenerator />,
-      },
+      }
     ],
   },
   {

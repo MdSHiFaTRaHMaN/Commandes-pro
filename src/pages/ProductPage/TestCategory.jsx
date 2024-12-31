@@ -135,8 +135,8 @@ const AddNewProduct = () => {
         if (response.status == 200) {
           message.success("Product Added Successfully");
         }
+        console.log(response, "resposne");
         setProductUploading(false);
-        navigate("/products")
       } catch (error) {
         console.error(error);
         message.error("Something went wrong");

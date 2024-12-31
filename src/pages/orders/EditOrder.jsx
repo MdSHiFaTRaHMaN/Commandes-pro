@@ -244,7 +244,7 @@ const EditOrder = () => {
       price: 0,
     };
 
-    setData([...data, newProduct]); // Add new product to table
+    setData([...data, newProduct]);
   };
 
   // Handle delete product
@@ -260,8 +260,8 @@ const EditOrder = () => {
 
   // Example of disabled time logic
   const disabledDateTime = () => ({
-    disabledHours: () => Array.from({ length: 24 }, (_, i) => i < 8 || i > 20), // Disable hours outside 8 AM - 8 PM
-    disabledMinutes: () => Array.from({ length: 60 }, (_, i) => i % 15 !== 0), // Only allow every 15 minutes
+    disabledHours: () => Array.from({ length: 24 }, (_, i) => i < 8 || i > 20),
+    disabledMinutes: () => Array.from({ length: 60 }, (_, i) => i % 15 !== 0),
   });
 
   const handleInputChange = (key, field, value) => {

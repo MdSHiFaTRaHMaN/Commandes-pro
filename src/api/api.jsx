@@ -162,39 +162,6 @@ export const useSingleAdmin = (id) => {
   return { admin, isLoading, isError, error, refetch };
 };
 
-export const useAllSubCategory = () => {
-  const getSubCategory = async () => {
-    try {
-      const response = await API.get("/category");
-      return response.data.data;
-    } catch (error) {
-      console.error("Error fetching SubCategory:", error);
-      throw error;
-    }
-  };
-
-  const [subCategoryList, setSubCategoryList] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    const fetchAllSubCategory = async () => {
-      try {
-        const categoryData = await getSubCategory();
-        setSubCategoryList(categoryData);
-      } catch (error) {
-        setError("Failed to fetch all Category.", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAllSubCategory();
-  }, []);
-
-  return { subCategoryList, loading, error };
-};
-
 // get category
 export const useCategory = () => {
   const getCategory = async () => {
@@ -214,6 +181,26 @@ export const useCategory = () => {
   });
 
   return { category, isLoading, isError, error, refetch };
+};
+// get category
+export const useSingleCategory = (handleId) => {
+  const getSingleCategory = async () => {
+    const response = await API.get(`/category/${handleId}`);
+    return response.data.data;
+  };
+
+  const {
+    data: singleCategory = [],
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["singleCategory", handleId],
+    queryFn: getSingleCategory,
+  });
+
+  return { singleCategory, isLoading, isError, error, refetch };
 };
 
 // get sub category
