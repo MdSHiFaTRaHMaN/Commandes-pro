@@ -160,7 +160,7 @@ function InvoiceOrder() {
         loading={printLoading}
         disabled={printLoading}
       >
-        <PrinterOutlined /> Print Invoice
+        <PrinterOutlined />
       </Button>
     </div>
   );

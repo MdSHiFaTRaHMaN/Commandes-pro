@@ -1,6 +1,6 @@
 import { useRef } from "react";
 import { useParams } from "react-router-dom";
-import { Button } from "antd";
+import { Button, Spin } from "antd";
 import { PrinterOutlined } from "@ant-design/icons";
 import { useSingleOrder } from "../../api/api";
 import html2pdf from "html2pdf.js";
@@ -11,10 +11,14 @@ function OrderInvoice() {
   const { singleOrder, isLoading } = useSingleOrder(orderId);
   const invoiceRef = useRef(); // Reference to the invoice container
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="text-center m-5">
+        <Spin size="large" />
+      </div>
+    );
   }
   if (!singleOrder) {
-    return <div>Order not found!</div>;
+    return <div>Somethings is Wrong</div>;
   }
 
   const {
@@ -23,12 +27,12 @@ function OrderInvoice() {
     delivery_date,
     sub_total,
     tax_amount,
+    tax,
     total,
     products,
     user_delivery_address,
     order_status,
   } = singleOrder;
-  // Function to handle printing the invoice
 
   const printInvoice = () => {
     const element = invoiceRef.current;
@@ -60,6 +64,7 @@ function OrderInvoice() {
       });
   };
 
+  
   return (
     <div className="w-3/5 mx-auto mt-5 p-6 bg-white border border-gray-200 rounded-lg shadow-md">
       <div id="content" ref={invoiceRef}>
@@ -177,7 +182,7 @@ function OrderInvoice() {
             </p>
             <p className="flex justify-between">
               <span>VAT Amount:</span>
-              <span>{tax_amount.toFixed(2)} €</span>
+              <span>{(tax_amount + tax).toFixed(2)} €</span>
             </p>
             <p className="flex justify-between font-bold">
               <span>Total (incl. VAT):</span>
