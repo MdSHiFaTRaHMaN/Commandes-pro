@@ -5,7 +5,7 @@ import Login from "../pages/Login";
 import PrivateRoute from "./PrivateRoute";
 import Products from "../pages/ProductPage/Products";
 import AddNewProduct from "../pages/ProductPage/AddNewProduct";
-import Categories from "../pages/ProductPage/Categories";
+import Categories from "../pages/category/Categories";
 import AdminList from "../pages/SettingsPage/AdminList";
 import Orders from "../pages/orders/Orders";
 import Test from "../pages/Test";

@@ -93,6 +93,19 @@ const EditOrder = () => {
     }
   }, [singleOrder]);
 
+  //  new use effect
+  useEffect(() => {
+    if (singleOrder && customerAddress?.length > 0) {
+      const address = customerAddress.find(
+        (addr) => addr.id === singleOrder.user_delivery_address_id
+      );
+      if (address) {
+        setSelectedAddress(address.id);
+        setSelectedAddressName(address.address);
+      }
+    }
+  }, [singleOrder, customerAddress]);
+
   useEffect(() => {
     const subtotal = data.reduce(
       (acc, item) =>
@@ -358,7 +371,6 @@ const EditOrder = () => {
         orderData
       );
 
-      console.log("response", response);
       if (response.status == 200) {
         message.success("Order Update Successfully");
         refetch();
@@ -435,11 +447,15 @@ const EditOrder = () => {
           <Select
             placeholder="Select an address"
             className="w-full h-12"
-            value={selectedAddressName}
-            onChange={(value) => setSelectedAddress(value)}
+            value={selectedAddressName || selectedAddress || undefined}
+            onChange={(value) => {
+              setSelectedAddress(value);
+              const address = customerAddress.find((addr) => addr.id === value);
+              setSelectedAddressName(address?.address || "");
+            }}
           >
             {customerAddress.map((address) => (
-              <Option key={address.map} value={address.id}>
+              <Option key={address.id} value={address.id}>
                 {address.address}
               </Option>
             ))}

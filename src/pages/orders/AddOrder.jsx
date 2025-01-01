@@ -318,13 +318,7 @@ const AddOrder = () => {
             Add an Order
           </span>
         </Title>
-        <div>
-          <Text className="block mb-2 font-medium">Order number:</Text>
-          <Input
-            placeholder="Enter Your Order number"
-            className="w-full h-12"
-          />
-        </div>
+
         <div className="my-3">
           <Text className="block mb-2 font-medium">Delivery Date</Text>
           <DatePicker
@@ -338,14 +332,6 @@ const AddOrder = () => {
             }}
           />
         </div>
-        {/* <div className="my-3">
-          <Text className="block mb-2 font-medium">Order Status</Text>
-          <Select placeholder="Select Order Status" className="w-full h-12">
-            <Option value="active">Active</Option>
-            <Option value="deactive">Deactive</Option>
-            <Option value="cancel">Cancelled</Option>
-          </Select>
-        </div> */}
         <h1 className="text-2xl font-semibold my-3">Customer</h1>
         <div>
           <Text className="block mb-2 font-medium">Select Customer</Text>

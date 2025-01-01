@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 export const API = axios.create({
-  baseURL: "https://grocary-ecommerce.vercel.app/api/v1",
-  // baseURL: "http://localhost:5000/api/v1",
+  // baseURL: "https://grocary-ecommerce.vercel.app/api/v1",
+  baseURL: "http://localhost:5000/api/v1",
 });
 
 API.interceptors.request.use((config) => {
@@ -424,7 +424,6 @@ export const usePermissionRole = () => {
 // get multiple order
 export const useMultipleOrder = (data) => {
   const getMultipleOrder = async () => {
-    console.log(data);
     const response = await API.get("/order/array", {
       params: { ordersID: data },
     });
