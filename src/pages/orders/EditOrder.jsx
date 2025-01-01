@@ -41,6 +41,7 @@ const EditOrder = () => {
   const [totalIncludingVAT, setTotalIncludingVAT] = useState(0);
   const [productUploading, setOrderUploading] = useState(false);
   const [accountType, setAccountType] = useState("");
+  const [totalTaxAmount, setTotalTaxAmount] = useState(0);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -121,7 +122,7 @@ const EditOrder = () => {
 
   const columns = [
     {
-      title: "Product Name",
+      title: "Nom du produit",
       dataIndex: "productId",
       key: "productId",
       width: 200,
@@ -144,7 +145,7 @@ const EditOrder = () => {
     },
 
     {
-      title: "Quantity",
+      title: "Quantité",
       dataIndex: "quantity",
       key: "quantity",
       render: (text, record) => (
@@ -161,7 +162,7 @@ const EditOrder = () => {
     },
 
     {
-      title: "Unit Price excluding VAT",
+      title: "Prix unitaire hors TVA",
       dataIndex: "unitPrice",
       width: 200,
       key: "unitPrice",
@@ -218,7 +219,7 @@ const EditOrder = () => {
       },
     },
     {
-      title: "Total excluding VAT",
+      title: "Prix incluant la TVA",
       dataIndex: "total",
       key: "total",
       width: 200,
@@ -257,7 +258,7 @@ const EditOrder = () => {
       price: 0,
     };
 
-    setData([...data, newProduct]); // Add new product to table
+    setData([...data, newProduct]);
   };
 
   // Handle delete product
@@ -273,8 +274,8 @@ const EditOrder = () => {
 
   // Example of disabled time logic
   const disabledDateTime = () => ({
-    disabledHours: () => Array.from({ length: 24 }, (_, i) => i < 8 || i > 20), // Disable hours outside 8 AM - 8 PM
-    disabledMinutes: () => Array.from({ length: 60 }, (_, i) => i % 15 !== 0), // Only allow every 15 minutes
+    disabledHours: () => Array.from({ length: 24 }, (_, i) => i < 8 || i > 20),
+    disabledMinutes: () => Array.from({ length: 60 }, (_, i) => i % 15 !== 0),
   });
 
   const handleInputChange = (key, field, value) => {
@@ -305,7 +306,10 @@ const EditOrder = () => {
         const unitPrice = parseFloat(updatedItem.unitPrice) || 0;
         const vat = parseFloat(updatedItem.vat) || 0;
 
-        updatedItem.total = (quantity * unitPrice * (1 + vat / 100)).toFixed(2);
+        const vatExcludingTotal = quantity * unitPrice;
+        const vatIncludingTotal = vatExcludingTotal * (1 + vat / 100);
+
+        updatedItem.total = vatIncludingTotal.toFixed(2);
 
         return updatedItem;
       }
@@ -314,14 +318,20 @@ const EditOrder = () => {
 
     setData(newData);
 
-    const subtotal = newData.reduce(
+    const totalAmount = newData.reduce(
       (acc, item) => acc + (parseFloat(item.total) || 0),
       0
     );
-    setSubtotalExcludingVAT(subtotal);
 
-    const vatAmount = subtotal * 0.2; // VAT 20%
-    setTotalIncludingVAT(subtotal + vatAmount);
+    const subtotalExcludingVAT = newData.reduce(
+      (acc, item) => acc + (item.unitPrice * item.quantity || 0),
+      0
+    );
+
+    const tax = totalAmount - subtotalExcludingVAT;
+    setSubtotalExcludingVAT(subtotalExcludingVAT);
+    setTotalIncludingVAT(totalAmount);
+    setTotalTaxAmount(tax);
   };
 
   const userData = allCustomer?.find((cust) => cust.id == selectedCustomer);
@@ -332,6 +342,12 @@ const EditOrder = () => {
       setSelectedCustomerName(userData.name);
     }
   }, [userData]);
+
+  useEffect(() => {
+    if (subtotalExcludingVAT && totalIncludingVAT) {
+      setTotalTaxAmount(totalIncludingVAT - subtotalExcludingVAT);
+    }
+  }, [subtotalExcludingVAT, totalIncludingVAT]);
 
   const userDeliveryAdd = deliveryAddress?.find(
     (deliAdd) => deliAdd.id == selectedAddress
@@ -478,16 +494,8 @@ const EditOrder = () => {
             Add Product
           </Button>
         </div>
-        <div>
-          <Text className="block">Subtotal excluding VAT:</Text>
-          <Input
-            value={`${subtotalExcludingVAT.toFixed(2)} €`}
-            readOnly
-            className="py-3"
-          />
-        </div>
 
-        <div className="my-3">
+        {/* <div className="my-3">
           <Text className="block">VAT (20%)</Text>
           <Input
             value={`${(subtotalExcludingVAT * 0.2).toFixed(2)} €`}
@@ -503,10 +511,29 @@ const EditOrder = () => {
             readOnly
             className="py-3"
           />
+        </div> */}
+
+        <div>
+          <Text className="block">Sous-total hors TVA:</Text>
+          <Input
+            value={`${subtotalExcludingVAT.toFixed(2)} €`}
+            readOnly
+            className="py-3"
+          />
+        </div>
+        <div className="mt-2">
+          <Text className="block">Montant total de la taxe:</Text>
+          <Input
+            value={`${totalTaxAmount.toFixed(2)} €`}
+            readOnly
+            className="py-3"
+          />
         </div>
 
         <div className="my-3">
-          <Text className="block font-semibold">Total including VAT:</Text>
+          <Text className="block font-semibold">
+            Le prix total inclut la TVA:
+          </Text>
           <Input
             value={`${totalIncludingVAT.toFixed(2)} €`}
             readOnly

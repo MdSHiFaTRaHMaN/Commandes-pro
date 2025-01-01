@@ -18,7 +18,6 @@ import dayjs from "dayjs";
 import { RiDeleteBin5Fill } from "react-icons/ri";
 import { useNavigate } from "react-router-dom";
 import AddAddressModel from "./AddAddressModel";
-import { FaArrowLeftLong } from "react-icons/fa6";
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -30,8 +29,6 @@ const AddOrder = () => {
   const [deliveryDate, setDeliveryDate] = useState(null);
   const { customerAddress, refetch } = useCustomerAddress(selectedCustomer);
   const [subtotalExcludingVAT, setSubtotalExcludingVAT] = useState(0);
-  const [totalTaxAmount, setTotalTaxAmount] = useState(0);
-  const [productTax, setProductTax] = useState([]);
   const [totalIncludingVAT, setTotalIncludingVAT] = useState(0);
   const [productUploading, setOrderUploading] = useState(false);
   const [accountType, setAccountType] = useState("");
@@ -68,7 +65,7 @@ const AddOrder = () => {
 
   const columns = [
     {
-      title: "Nom du produit",
+      title: "Product Name",
       dataIndex: "productId",
       key: "productId",
       width: 200,
@@ -102,7 +99,7 @@ const AddOrder = () => {
       ),
     },
     {
-      title: "Quantité",
+      title: "Quantity",
       dataIndex: "quantity",
       key: "quantity",
       render: (text, record) => (
@@ -119,7 +116,7 @@ const AddOrder = () => {
     },
 
     {
-      title: "Prix unitaire hors TVA",
+      title: "Unit Price excluding VAT",
       dataIndex: "unitPrice",
       width: 200,
       key: "unitPrice",
@@ -176,7 +173,7 @@ const AddOrder = () => {
       },
     },
     {
-      title: "Prix incluant la TVA",
+      title: "Total excluding VAT",
       dataIndex: "total",
       key: "total",
       width: 200,
@@ -251,12 +248,8 @@ const AddOrder = () => {
         const quantity = parseFloat(updatedItem.quantity) || 0;
         const unitPrice = parseFloat(updatedItem.unitPrice) || 0;
         const vat = parseFloat(updatedItem.vat) || 0;
-        setProductTax(vat);
 
-        const vatExcludingTotal = quantity * unitPrice;
-        const vatIncludingTotal = vatExcludingTotal * (1 + vat / 100);
-
-        updatedItem.total = vatIncludingTotal.toFixed(2);
+        updatedItem.total = (quantity * unitPrice * (1 + vat / 100)).toFixed(2);
 
         return updatedItem;
       }
@@ -265,20 +258,14 @@ const AddOrder = () => {
 
     setData(newData);
 
-    const totalAmount = newData.reduce(
+    const subtotal = newData.reduce(
       (acc, item) => acc + (parseFloat(item.total) || 0),
       0
     );
+    setSubtotalExcludingVAT(subtotal);
 
-    const subtotalExcludingVAT = newData.reduce(
-      (acc, item) => acc + (item.unitPrice * item.quantity || 0),
-      0
-    );
-
-    const tax = totalAmount - subtotalExcludingVAT;
-    setTotalTaxAmount(tax);
-    setSubtotalExcludingVAT(subtotalExcludingVAT);
-    setTotalIncludingVAT(totalAmount);
+    const vatAmount = subtotal * 0.2; // VAT 20%
+    setTotalIncludingVAT(subtotal + vatAmount);
   };
 
   const userData = allCustomer.find((cust) => cust.id == selectedCustomer);
@@ -300,7 +287,7 @@ const AddOrder = () => {
       return;
     }
     setError(false);
-
+  
     // Customer validation
     if (!selectedCustomer) {
       setError(true);
@@ -308,7 +295,7 @@ const AddOrder = () => {
       return;
     }
     setError(false);
-
+  
     // Delivery address validation
     if (!selectedAddress) {
       setAddressError(true);
@@ -316,7 +303,7 @@ const AddOrder = () => {
       return;
     }
     setAddressError(false);
-
+  
     // Product validation
     let hasProductError = false;
     const updatedData = data.map((item) => {
@@ -326,13 +313,13 @@ const AddOrder = () => {
       }
       return { ...item, error: false };
     });
-
+  
     if (hasProductError) {
       setData(updatedData);
       message.error("Please select product .");
       return;
     }
-
+  
     // Prepare order data
     const orderData = {
       company: userData.company,
@@ -350,7 +337,7 @@ const AddOrder = () => {
         price: item.unitPrice,
       })),
     };
-
+  
     try {
       setOrderUploading(true);
       const response = await API.post(
@@ -368,19 +355,14 @@ const AddOrder = () => {
       setOrderUploading(false);
     }
   };
+  
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100 my-4">
       <div className="w-full max-w-6xl bg-white shadow-lg rounded-lg p-8">
-        <button
-          onClick={() => navigate(-1)}
-          className="cursor-pointer text-[30px] hover:bg-gray-200 p-3 rounded-full"
-        >
-          <FaArrowLeftLong />
-        </button>
         <Title
           level={3}
-          className="text-pink-500 mt-[-40px] text-2xl font-bold mb-6 text-center"
+          className="text-pink-500 text-2xl font-bold mb-6 text-center"
         >
           <span className="text-pink-500 text-2xl font-bold mb-6 text-center">
             Add an Order
@@ -392,6 +374,9 @@ const AddOrder = () => {
           <DatePicker
             format="YYYY-MM-DD HH:mm:ss"
             className={`w-full h-12 ${error ? "border-red-500" : ""}`}
+            disabledDate={(current) =>
+              current && current < dayjs().endOf("day")
+            }
             disabledTime={() => ({
               disabledHours: () =>
                 Array.from({ length: 24 }, (_, i) => i < 8 || i > 20),
@@ -410,6 +395,7 @@ const AddOrder = () => {
         </div>
 
         {/* coustomer  */}
+
         <h1 className="text-2xl font-semibold my-3">Customer</h1>
         <div>
           <Text className="block mb-2 font-medium">Select Customer</Text>
@@ -478,55 +464,35 @@ const AddOrder = () => {
             Add Product
           </Button>
         </div>
-
-        {/* <div className="my-3">
-          <Text className="block">VAT (5.5%)</Text>
-          <Input
-            value={`${((subtotalExcludingVAT / 100) * 5.5).toFixed(2)} €`}
-            readOnly
-            className="py-3"
-          />
-        </div>
-
         <div>
-          <Text className="block">VAT (15%):</Text>
-          <Input
-            value={`${((subtotalExcludingVAT / 100) * 15).toFixed(2)} €`}
-            readOnly
-            className="py-3"
-          />
-        </div>
-
-        <div>
-          <Text className="block">VAT (20%):</Text>
-          <Input
-            value={`${((subtotalExcludingVAT / 100) * 20).toFixed(2)} €`}
-            readOnly
-            className="py-3"
-          />
-        </div> */}
-
-        <div>
-          <Text className="block">Sous-total hors TVA:</Text>
+          <Text className="block">Subtotal excluding VAT:</Text>
           <Input
             value={`${subtotalExcludingVAT.toFixed(2)} €`}
             readOnly
             className="py-3"
           />
         </div>
-        <div className="mt-2">
-          <Text className="block">Montant total de la taxe:</Text>
+
+        <div className="my-3">
+          <Text className="block">VAT (20%)</Text>
           <Input
-            value={`${totalTaxAmount.toFixed(2)} €`}
+            value={`${(subtotalExcludingVAT * 0.2).toFixed(2)} €`}
+            readOnly
+            className="py-3"
+          />
+        </div>
+
+        <div>
+          <Text className="block">VAT (5.5%):</Text>
+          <Input
+            value={`${(subtotalExcludingVAT * 0.055).toFixed(2)} €`}
             readOnly
             className="py-3"
           />
         </div>
 
         <div className="my-3">
-          <Text className="block font-semibold">
-            Le prix total inclut la TVA:
-          </Text>
+          <Text className="block font-semibold">Total including VAT:</Text>
           <Input
             value={`${totalIncludingVAT.toFixed(2)} €`}
             readOnly

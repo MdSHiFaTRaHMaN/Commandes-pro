@@ -1,9 +1,7 @@
 import { useState } from "react";
-import { Input, Select, DatePicker, Button, message } from "antd";
+import { Input, DatePicker, Button, message } from "antd";
 import { API } from "../api/api";
 import { useNavigate } from "react-router-dom";
-
-const { Option } = Select;
 
 const AddClient = () => {
   const [profile, setProfile] = useState("Restoration");
@@ -111,6 +109,7 @@ const AddClient = () => {
                 placeholder="Client Name *"
                 name="client_name"
                 className="border-gray-300 py-2"
+                required
               />
             </div>
             <div>
@@ -119,6 +118,7 @@ const AddClient = () => {
                 placeholder="Email *"
                 name="email"
                 className="border-gray-300 py-2"
+                required
               />
             </div>
             <div>
@@ -127,6 +127,7 @@ const AddClient = () => {
                 name="company_name"
                 placeholder="Company Name *"
                 className="border-gray-300 py-2"
+                required
               />
             </div>
 
@@ -136,6 +137,7 @@ const AddClient = () => {
                 name="siret_number"
                 placeholder="Siret Number *"
                 className="border-gray-300 py-2"
+                required
               />
             </div>
             <div>
@@ -144,6 +146,7 @@ const AddClient = () => {
                 placeholder="Taught *"
                 name="taught"
                 className="border-gray-300 py-2"
+                required
               />
             </div>
             <div>
@@ -152,6 +155,7 @@ const AddClient = () => {
                 name="city"
                 placeholder="Type City *"
                 className="border-gray-300 py-2"
+                required
               />
             </div>
             <div>
@@ -160,6 +164,7 @@ const AddClient = () => {
                 name="billing_address"
                 placeholder="Billing Address *"
                 className="border-gray-300 py-2"
+                required
               />
             </div>
             <div>
@@ -168,6 +173,7 @@ const AddClient = () => {
                 name="postal_code"
                 placeholder="Postal Code *"
                 className="border-gray-300 py-2"
+                required
               />
             </div>
             <div>
@@ -176,6 +182,7 @@ const AddClient = () => {
                 name="billing_contact"
                 placeholder="Billing Contact Name *"
                 className="border-gray-300 py-2"
+                required
               />
             </div>
 
@@ -185,6 +192,7 @@ const AddClient = () => {
                 name="mobile"
                 placeholder="Mobile / Direct Line *"
                 className="border-gray-300 py-2"
+                required
               />
             </div>
             <div>
@@ -193,6 +201,7 @@ const AddClient = () => {
                 name="creation_date"
                 className="w-full border-gray-300 py-2"
                 placeholder="Account Creation Date *"
+                required
               />
             </div>
           </div>

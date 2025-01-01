@@ -6,7 +6,10 @@ import "../orders/Orders.css";
 import countries from "../../assets/countries.json";
 import { API, useAllProduct } from "../../api/api";
 import { Link } from "react-router-dom";
+import { IoSearch } from "react-icons/io5";
 const EditableContext = React.createContext(null);
+
+const { Search } = Input;
 
 const EditableRow = ({ index, ...props }) => {
   const [form] = Form.useForm();
@@ -87,14 +90,26 @@ const EditableCell = ({
 
 const Products = () => {
   const [deletingLoading, setDeletingLoading] = useState(false);
+  const [nameSearch, setNameSearch] = useState("");
 
   const [filters, setFilters] = useState({
     page: 1,
     limit: 10,
+    name: nameSearch,
   });
 
   const { allProduct, pagination, isLoading, isError, error, refetch } =
     useAllProduct(filters);
+
+  useEffect(() => {
+    if (nameSearch) {
+      setFilters({
+        page: filters.page,
+        limit: filters.limit,
+        name: nameSearch,
+      });
+    }
+  }, [nameSearch]);
 
   const handleTableChange = (pagination, tableFilters) => {
     const { current: page, pageSize: limit } = pagination;
@@ -105,6 +120,8 @@ const Products = () => {
       limit,
     }));
   };
+
+  const onSearch = (value) => setNameSearch(value);
 
   const dataSource = allProduct.map((item) => ({
     ...item,
@@ -333,41 +350,57 @@ const Products = () => {
     };
   });
 
-  if (isLoading) return <Spin size="large" className="block mx-auto my-10" />;
-  if (isError)
-    return (
-      <div className="text-center text-red-500">
-        {error.message || "Something went wrong"}
-      </div>
-    );
-
   return (
     <div className="mx-4 my-5 border-shadow">
-      <div className="flex justify-between mx-6 mb-5">
-        <div className="text-3xl font-bold text-[#e24c80]">
-          Liste des Produits
-        </div>
-        <Link to="/addtoproduct">
-          <button className="bg-[#e24c80] p-3 text-white font-semibold rounded-md flex items-center gap-1">
-            <FaPlus /> Add New Product
-          </button>
-        </Link>
-      </div>
+      <div className="mx-4 my-5 border-shadow">
+        <div className="flex justify-between mx-6 mb-5">
+          <div className="text-3xl font-bold text-[#e24c80]">
+            Liste des Produits
+          </div>
+          {/* Search Input */}
+          <Search
+            placeholder="Search for anything..."
+            className="w-[350px] transition-all duration-300 ease-in-out transform hover:scale-105 focus:shadow-lg rounded-lg border border-gray-300"
+            onSearch={onSearch}
+            size="large"
+            style={{
+              backgroundColor: "white",
+              boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+            }}
+          />
 
-      <div className="mx-6">
-        <Table
-          components={components}
-          rowClassName={() => "editable-row"}
-          bordered
-          dataSource={dataSource}
-          pagination={{
-            current: filters.page,
-            pageSize: filters.limit,
-            total: pagination.totalProducts,
-          }}
-          onChange={handleTableChange}
-          columns={columns}
-        />
+          <Link to="/addtoproduct">
+            <button className="bg-[#e24c80] p-3 text-white font-semibold rounded-md flex items-center gap-1">
+              <FaPlus /> Add New Product
+            </button>
+          </Link>
+        </div>
+
+        <div className="mx-6">
+          {isLoading ? (
+            <Spin size="large" className="block mx-auto my-10" />
+          ) : (
+            <Table
+              components={components}
+              rowClassName={() => "editable-row"}
+              bordered
+              dataSource={dataSource}
+              pagination={{
+                current: filters.page,
+                pageSize: filters.limit,
+                total: pagination.totalProducts,
+              }}
+              onChange={handleTableChange}
+              columns={columns}
+            />
+          )}
+
+          {isError && (
+            <div className="text-center text-red-500">
+              {error.message || "Something went wrong"}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
