@@ -120,10 +120,6 @@ const Orders = () => {
     }
   };
 
-  const handlePrint = (value) => {
-    console.log("handlePrint", value);
-  };
-
   const onDateChange = async (id, date, dateString) => {
     try {
       const response = await API.put(`/order/update/${id}`, {
@@ -214,10 +210,7 @@ const Orders = () => {
       render: (_, record) => (
         <div className="flex gap-3 text-xl">
           <Link to={`/order-invoice/${record.id}`}>
-            <IoPrint
-              className="cursor-pointer"
-              onClick={() => handlePrint(record)}
-            />
+            <IoPrint className="cursor-pointer" />
           </Link>
 
           <Link to={`/orders/edit/${record.id}`}>

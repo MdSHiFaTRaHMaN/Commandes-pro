@@ -91,12 +91,12 @@ function MultiOrderInvoice() {
               <tr>
                 <th className="border border-gray-300 p-2">Product</th>
                 <th className="border border-gray-300 p-2">Quantity</th>
-                <th className="border border-gray-300 p-2">
+                {/* <th className="border border-gray-300 p-2">
                   Price (excl. VAT)
                 </th>
                 <th className="border border-gray-300 p-2">
                   Total (excl. VAT)
-                </th>
+                </th> */}
               </tr>
             </thead>
             <tbody>
@@ -108,27 +108,25 @@ function MultiOrderInvoice() {
                   <td className="border border-gray-300 p-2">
                     {product.quantity}
                   </td>
-                  <td className="border border-gray-300 p-2">
+                  {/* <td className="border border-gray-300 p-2">
                     {product.price.toFixed(2)} €
                   </td>
                   <td className="border border-gray-300 p-2">
                     {(product.price * product.quantity).toFixed(2)} €
-                  </td>
+                  </td> */}
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
+      </div>
 
-        {/* Summary Section */}
-        <div className="flex justify-end mt-8">
-          <div className="w-full md:w-1/3">
-            <p className="flex justify-between font-bold">
-              <span>Total (incl. VAT):</span>
-              <span>{totalPrice.toFixed(2)} €</span>
-            </p>
-          </div>
-        </div>
+      {/* Summary Section */}
+      <div className="flex justify-end mt-8">
+        <p className="flex  font-bold">
+          <span className="mr-1">Total Price: </span>
+          <span> {totalPrice.toFixed(2)} €</span>
+        </p>
       </div>
       {/* Print Button */}
       <Button
