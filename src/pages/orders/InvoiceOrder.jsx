@@ -157,6 +157,8 @@ function InvoiceOrder() {
         type="default"
         className="text-white bg-PrimaryColor p-5 font-semibold mt-6"
         onClick={printInvoice}
+        loading={printLoading}
+        disabled={printLoading}
       >
         <PrinterOutlined /> Print Invoice
       </Button>

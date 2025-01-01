@@ -27,6 +27,7 @@ import Setting from "../pages/app/Setting";
 import PageManegment from "../pages/app/PageManegment";
 import Customer from "../pages/Customer";
 import PageNotFound from "../components/PageNotFound";
+import TestOrder from "../pages/orders/TestOrder"
 
 export const router = createBrowserRouter([
   {
@@ -125,6 +126,10 @@ export const router = createBrowserRouter([
       {
         path: "/invoice",
         element: <InvoiceGenerator />,
+      },
+      {
+        path: "/hello",
+        element: <TestOrder />
       }
     ],
   },

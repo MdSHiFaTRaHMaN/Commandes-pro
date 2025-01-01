@@ -6,6 +6,7 @@ import "../orders/Orders.css";
 import countries from "../../assets/countries.json";
 import { API, useAllProduct } from "../../api/api";
 import { Link } from "react-router-dom";
+import { IoSearch } from "react-icons/io5";
 const EditableContext = React.createContext(null);
 
 const EditableRow = ({ index, ...props }) => {
@@ -343,31 +344,45 @@ const Products = () => {
 
   return (
     <div className="mx-4 my-5 border-shadow">
-      <div className="flex justify-between mx-6 mb-5">
-        <div className="text-3xl font-bold text-[#e24c80]">
-          Liste des Produits
-        </div>
-        <Link to="/addtoproduct">
-          <button className="bg-[#e24c80] p-3 text-white font-semibold rounded-md flex items-center gap-1">
-            <FaPlus /> Add New Product
-          </button>
-        </Link>
-      </div>
+      <div className="mx-4 my-5 border-shadow">
+        <div className="flex justify-between mx-6 mb-5">
+          <div className="text-3xl font-bold text-[#e24c80]">
+            Liste des Produits
+          </div>
+          {/* Search Input */}
+          <div className="relative w-72 mr-4">
+            <input
+              type="text"
+              placeholder="Search Product"
+              className="w-full pl-10 pr-4 py-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500"
+            />
+            <div className="absolute inset-y-0 left-3 flex items-center text-gray-500">
+            <IoSearch />
+            </div>
+          </div>
 
-      <div className="mx-6">
-        <Table
-          components={components}
-          rowClassName={() => "editable-row"}
-          bordered
-          dataSource={dataSource}
-          pagination={{
-            current: filters.page,
-            pageSize: filters.limit,
-            total: pagination.totalProducts,
-          }}
-          onChange={handleTableChange}
-          columns={columns}
-        />
+          <Link to="/addtoproduct">
+            <button className="bg-[#e24c80] p-3 text-white font-semibold rounded-md flex items-center gap-1">
+              <FaPlus /> Add New Product
+            </button>
+          </Link>
+        </div>
+
+        <div className="mx-6">
+          <Table
+            components={components}
+            rowClassName={() => "editable-row"}
+            bordered
+            dataSource={dataSource}
+            pagination={{
+              current: filters.page,
+              pageSize: filters.limit,
+              total: pagination.totalProducts,
+            }}
+            onChange={handleTableChange}
+            columns={columns}
+          />
+        </div>
       </div>
     </div>
   );
