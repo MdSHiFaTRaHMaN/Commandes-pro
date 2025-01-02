@@ -127,8 +127,6 @@ const AddNewProduct = () => {
         subcategories: selectedSubCategoriesId,
         images: response.data.urls || [],
 
-        is_Stock: data.inStock || "",
-        packaging: data.packaging || "",
         weightVolumeUnit: data.weightVolumeUnit || "",
       };
 
