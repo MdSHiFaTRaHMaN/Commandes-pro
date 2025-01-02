@@ -181,17 +181,18 @@ const Products = () => {
       dataIndex: "id",
       key: "id",
     },
-
     {
       title: "PRODUITS",
       dataIndex: "name",
       editable: true,
-      width: "100%",
+      width: "10%",
+      // fixed: "left",
     },
 
     {
       title: "PRIX D'ACHAT",
       dataIndex: "purchase_price",
+      // fixed: "left",
       render: (_, record) => `${record.purchase_price.toFixed(2)}€`,
       editable: true,
     },
@@ -199,24 +200,25 @@ const Products = () => {
       title: "Restauration",
       dataIndex: "regular_price",
       render: (_, record) => `${record.regular_price.toFixed(2)}€`,
-      editable: true,
     },
     {
       title: "Revendeur",
       dataIndex: "selling_price",
       render: (_, record) => `${record.selling_price.toFixed(2)}€`,
-      editable: true,
     },
     {
       title: "Grossiste",
       dataIndex: "whole_price",
       render: (_, record) => `${record.whole_price.toFixed(2)}€`,
-      editable: true,
+    },
+    {
+      title: "Supper Marcent",
+      dataIndex: "supper_marcent",
+      render: (_, record) => `${record.supper_marcent.toFixed(2)}€`,
     },
     {
       title: "UV",
-      dataIndex: "supper_marcent",
-      render: (_, record) => `${record.supper_marcent.toFixed(2)}€`,
+      dataIndex: "uvw",
       editable: true,
     },
     {
@@ -243,17 +245,8 @@ const Products = () => {
     },
     {
       title: "STOCK",
-      dataIndex: "is_stock",
-      render: (_, record) => (
-        <Select
-          value={record?.is_stock == 1 ? "In Stock" : "Out of Stock"}
-          onChange={(value) => handleStatusChange(record.id, "is_stock", value)}
-          options={[
-            { value: true, label: "In Stock" },
-            { value: false, label: "Out of Stock" },
-          ]}
-        />
-      ),
+      dataIndex: "in_stock",
+      editable: true,
     },
 
     {
@@ -293,7 +286,7 @@ const Products = () => {
     {
       title: "ACTIONS",
       dataIndex: "operation",
-
+      // fixed: "right",
       render: (_, record) => (
         <div className="flex gap-3 text-xl">
           <Link to={`/products/edit/${record.id}`}>
@@ -314,14 +307,43 @@ const Products = () => {
 
   const handleSave = async (row) => {
     const id = row?.id;
+
+    const purchase_price = parseFloat(row.purchase_price);
+    const regular_price = parseFloat(
+      (purchase_price + purchase_price * 0.2).toFixed(0)
+    );
+    const selling_price = parseFloat(
+      (purchase_price + purchase_price * 0.25).toFixed(0)
+    );
+    const whole_price = parseFloat(
+      (purchase_price + purchase_price * 0.15).toFixed(0)
+    );
+    const supper_marcent = parseFloat(
+      (purchase_price + purchase_price * 0.1).toFixed(0)
+    );
+
+    const formData = {
+      name: row.name,
+      product_type: row.product_type,
+      unit: row.unit,
+      tax: row.tax,
+      packaging: row.packaging,
+      uvw: row.uvw,
+      in_stock: row.in_stock,
+      country: row.country,
+      purchase_price: purchase_price,
+      regular_price: regular_price,
+      selling_price: selling_price,
+      whole_price: whole_price,
+      supper_marcent: supper_marcent,
+      discount_price: row.discount_price,
+    };
+
     try {
-      const response = await API.put(`/product/upd/${id}`, row);
+      const response = await API.put(`/product/upd/${id}`, formData);
       if (response.status === 200) {
         message.success(`${row.name} updated successfully!`);
       }
-
-      console.log("response", response);
-
       refetch();
     } catch (error) {
       message.error(`Failed to add ${row.name}. Try again.`);
@@ -389,6 +411,9 @@ const Products = () => {
                 current: filters.page,
                 pageSize: filters.limit,
                 total: pagination.totalProducts,
+              }}
+              scroll={{
+                x: "max-content",
               }}
               onChange={handleTableChange}
               columns={columns}

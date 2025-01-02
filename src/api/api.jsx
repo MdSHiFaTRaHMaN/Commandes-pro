@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 export const API = axios.create({
-  baseURL: "https://grocary-ecommerce.vercel.app/api/v1",
-  // baseURL: "http://localhost:5000/api/v1",
+  // baseURL: "https://grocary-ecommerce.vercel.app/api/v1",
+  baseURL: "http://localhost:5000/api/v1",
 });
 
 API.interceptors.request.use((config) => {

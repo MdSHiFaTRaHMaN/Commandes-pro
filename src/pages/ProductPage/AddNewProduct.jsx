@@ -112,6 +112,9 @@ const AddNewProduct = () => {
         product_type: "physical",
         unit: data.productUnit || "",
         long_description: data.productDescription || "",
+        packaging: data.packaging,
+        uvw: data.weightVolumeUnit,
+        in_stock: data.inStock,
         tax: data.vat || 0,
         country: data.origin || "",
         purchase_price: data.purchasePrice || 0,
@@ -128,7 +131,7 @@ const AddNewProduct = () => {
         packaging: data.packaging || "",
         weightVolumeUnit: data.weightVolumeUnit || "",
       };
-      console.log(productData);
+
       try {
         setProductUploading(true);
         const response = await API.post("/product/create", productData);
@@ -136,7 +139,7 @@ const AddNewProduct = () => {
           message.success("Product Added Successfully");
         }
         setProductUploading(false);
-        navigate("/products")
+        navigate("/products");
       } catch (error) {
         console.error(error);
         message.error("Something went wrong");
@@ -414,8 +417,9 @@ const AddNewProduct = () => {
                           error ? "border-red-500" : ""
                         }`}
                       >
-                        <Option value="5">5.5</Option>
-                        <Option value="15">15</Option>
+                        <Option value="0">0</Option>
+                        <Option value="5.5">5.5</Option>
+                        <Option value="10">10</Option>
                         <Option value="20">20</Option>
                       </Select>
                       {error && (
