@@ -23,6 +23,7 @@ function OrderInvoice() {
     delivery_date,
     sub_total,
     tax_amount,
+    tax,
     total,
     products,
     user_delivery_address,
@@ -177,7 +178,7 @@ function OrderInvoice() {
             </p>
             <p className="flex justify-between">
               <span>VAT Amount:</span>
-              <span>{tax_amount.toFixed(2)} €</span>
+              <span>{(tax_amount + tax).toFixed(2)} €</span>
             </p>
             <p className="flex justify-between font-bold">
               <span>Total (incl. VAT):</span>

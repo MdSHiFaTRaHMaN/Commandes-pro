@@ -6,7 +6,10 @@ import "../orders/Orders.css";
 import countries from "../../assets/countries.json";
 import { API, useAllProduct } from "../../api/api";
 import { Link } from "react-router-dom";
+import { IoSearch } from "react-icons/io5";
 const EditableContext = React.createContext(null);
+
+const { Search } = Input;
 
 const EditableRow = ({ index, ...props }) => {
   const [form] = Form.useForm();
@@ -87,14 +90,26 @@ const EditableCell = ({
 
 const Products = () => {
   const [deletingLoading, setDeletingLoading] = useState(false);
+  const [nameSearch, setNameSearch] = useState("");
 
   const [filters, setFilters] = useState({
     page: 1,
     limit: 10,
+    name: nameSearch,
   });
 
   const { allProduct, pagination, isLoading, isError, error, refetch } =
     useAllProduct(filters);
+
+  useEffect(() => {
+    if (nameSearch) {
+      setFilters({
+        page: filters.page,
+        limit: filters.limit,
+        name: nameSearch,
+      });
+    }
+  }, [nameSearch]);
 
   const handleTableChange = (pagination, tableFilters) => {
     const { current: page, pageSize: limit } = pagination;
@@ -105,6 +120,8 @@ const Products = () => {
       limit,
     }));
   };
+
+  const onSearch = (value) => setNameSearch(value);
 
   const dataSource = allProduct.map((item) => ({
     ...item,
@@ -164,17 +181,18 @@ const Products = () => {
       dataIndex: "id",
       key: "id",
     },
-
     {
       title: "PRODUITS",
       dataIndex: "name",
       editable: true,
-      width: "100%",
+      width: "10%",
+      // fixed: "left",
     },
 
     {
       title: "PRIX D'ACHAT",
       dataIndex: "purchase_price",
+      // fixed: "left",
       render: (_, record) => `${record.purchase_price.toFixed(2)}€`,
       editable: true,
     },
@@ -182,24 +200,25 @@ const Products = () => {
       title: "Restauration",
       dataIndex: "regular_price",
       render: (_, record) => `${record.regular_price.toFixed(2)}€`,
-      editable: true,
     },
     {
       title: "Revendeur",
       dataIndex: "selling_price",
       render: (_, record) => `${record.selling_price.toFixed(2)}€`,
-      editable: true,
     },
     {
       title: "Grossiste",
       dataIndex: "whole_price",
       render: (_, record) => `${record.whole_price.toFixed(2)}€`,
-      editable: true,
+    },
+    {
+      title: "Supper Marcent",
+      dataIndex: "supper_marcent",
+      render: (_, record) => `${record.supper_marcent.toFixed(2)}€`,
     },
     {
       title: "UV",
-      dataIndex: "supper_marcent",
-      render: (_, record) => `${record.supper_marcent.toFixed(2)}€`,
+      dataIndex: "uvw",
       editable: true,
     },
     {
@@ -226,17 +245,8 @@ const Products = () => {
     },
     {
       title: "STOCK",
-      dataIndex: "is_stock",
-      render: (_, record) => (
-        <Select
-          value={record?.is_stock == 1 ? "In Stock" : "Out of Stock"}
-          onChange={(value) => handleStatusChange(record.id, "is_stock", value)}
-          options={[
-            { value: true, label: "In Stock" },
-            { value: false, label: "Out of Stock" },
-          ]}
-        />
-      ),
+      dataIndex: "in_stock",
+      editable: true,
     },
 
     {
@@ -276,7 +286,7 @@ const Products = () => {
     {
       title: "ACTIONS",
       dataIndex: "operation",
-
+      // fixed: "right",
       render: (_, record) => (
         <div className="flex gap-3 text-xl">
           <Link to={`/products/edit/${record.id}`}>
@@ -297,14 +307,43 @@ const Products = () => {
 
   const handleSave = async (row) => {
     const id = row?.id;
+
+    const purchase_price = parseFloat(row.purchase_price);
+    const regular_price = parseFloat(
+      (purchase_price + purchase_price * 0.2).toFixed(0)
+    );
+    const selling_price = parseFloat(
+      (purchase_price + purchase_price * 0.25).toFixed(0)
+    );
+    const whole_price = parseFloat(
+      (purchase_price + purchase_price * 0.15).toFixed(0)
+    );
+    const supper_marcent = parseFloat(
+      (purchase_price + purchase_price * 0.1).toFixed(0)
+    );
+
+    const formData = {
+      name: row.name,
+      product_type: row.product_type,
+      unit: row.unit,
+      tax: row.tax,
+      packaging: row.packaging,
+      uvw: row.uvw,
+      in_stock: row.in_stock,
+      country: row.country,
+      purchase_price: purchase_price,
+      regular_price: regular_price,
+      selling_price: selling_price,
+      whole_price: whole_price,
+      supper_marcent: supper_marcent,
+      discount_price: row.discount_price,
+    };
+
     try {
-      const response = await API.put(`/product/upd/${id}`, row);
+      const response = await API.put(`/product/upd/${id}`, formData);
       if (response.status === 200) {
         message.success(`${row.name} updated successfully!`);
       }
-
-      console.log("response", response);
-
       refetch();
     } catch (error) {
       message.error(`Failed to add ${row.name}. Try again.`);
@@ -333,41 +372,60 @@ const Products = () => {
     };
   });
 
-  if (isLoading) return <Spin size="large" className="block mx-auto my-10" />;
-  if (isError)
-    return (
-      <div className="text-center text-red-500">
-        {error.message || "Something went wrong"}
-      </div>
-    );
-
   return (
     <div className="mx-4 my-5 border-shadow">
-      <div className="flex justify-between mx-6 mb-5">
-        <div className="text-3xl font-bold text-[#e24c80]">
-          Liste des Produits
-        </div>
-        <Link to="/addtoproduct">
-          <button className="bg-[#e24c80] p-3 text-white font-semibold rounded-md flex items-center gap-1">
-            <FaPlus /> Add New Product
-          </button>
-        </Link>
-      </div>
+      <div className="mx-4 my-5 border-shadow">
+        <div className="flex justify-between mx-6 mb-5">
+          <div className="text-3xl font-bold text-[#e24c80]">
+            Liste des Produits
+          </div>
+          {/* Search Input */}
+          <Search
+            placeholder="Search for anything..."
+            className="w-[350px] transition-all duration-300 ease-in-out transform hover:scale-105 focus:shadow-lg rounded-lg border border-gray-300"
+            onSearch={onSearch}
+            size="large"
+            style={{
+              backgroundColor: "white",
+              boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+            }}
+          />
 
-      <div className="mx-6">
-        <Table
-          components={components}
-          rowClassName={() => "editable-row"}
-          bordered
-          dataSource={dataSource}
-          pagination={{
-            current: filters.page,
-            pageSize: filters.limit,
-            total: pagination.totalProducts,
-          }}
-          onChange={handleTableChange}
-          columns={columns}
-        />
+          <Link to="/addtoproduct">
+            <button className="bg-[#e24c80] p-3 text-white font-semibold rounded-md flex items-center gap-1">
+              <FaPlus /> Add New Product
+            </button>
+          </Link>
+        </div>
+
+        <div className="mx-6">
+          {isLoading ? (
+            <Spin size="large" className="block mx-auto my-10" />
+          ) : (
+            <Table
+              components={components}
+              rowClassName={() => "editable-row"}
+              bordered
+              dataSource={dataSource}
+              pagination={{
+                current: filters.page,
+                pageSize: filters.limit,
+                total: pagination.totalProducts,
+              }}
+              scroll={{
+                x: "max-content",
+              }}
+              onChange={handleTableChange}
+              columns={columns}
+            />
+          )}
+
+          {isError && (
+            <div className="text-center text-red-500">
+              {error.message || "Something went wrong"}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

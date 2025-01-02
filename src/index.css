@@ -71,5 +71,29 @@
     text-align: center;
   }
   
+  .ant-table-thead > tr > th:nth-child(13) {
+    background-color: #e24c80;
+    color: white;
+    text-align: center;
+  }
+  
+  .ant-table-thead > tr > th:nth-child(14) {
+    background-color: #e24c80;
+    color: white;
+    text-align: center;
+  }
+  
+  .ant-table-thead > tr > th:nth-child(15) {
+    background-color: #e24c80;
+    color: white;
+    text-align: center;
+  }
+  
+  .ant-table-thead > tr > th:nth-child(16) {
+    background-color: #e24c80;
+    color: white;
+    text-align: center;
+  }
+  
 
   

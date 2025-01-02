@@ -25,6 +25,7 @@ const EditProduct = () => {
 
   const { category } = useCategory();
   const [selectCategoryID, setSelectCategoryID] = useState();
+  const [selectCategoryName, setSelectCategoryName] = useState();
   const { subCategory } = useSubCategory(selectCategoryID);
   const navigate = useNavigate();
   const [fileList, setFileList] = useState([]);
@@ -45,7 +46,7 @@ const EditProduct = () => {
   const [inStock, setInStock] = useState(0);
   const [productName, setProductName] = useState();
   const [productDescription, setProductDescription] = useState();
-  const [weigthVolumeUnit, setWeigthVolumeUnit] = useState(0);
+  const [weigthVolumeUnit, setWeigthVolumeUnit] = useState("");
   const [inDiscount, setInDiscount] = useState(0);
   const [productUploading, setProductUploading] = useState(false);
 
@@ -53,8 +54,15 @@ const EditProduct = () => {
     if (singleProduct) {
       setProductName(singleProduct.name);
       setSelectCategoryID(singleProduct.category_id);
+      setSelectCategoryName(
+        category.find((ctry) => ctry.id == singleProduct.category_id)
+          ?.category_name
+      );
       setProductUnit(singleProduct.unit);
       setProductDescription(singleProduct.long_description);
+      setPackaging(singleProduct.packaging);
+      setInStock(singleProduct.in_stock);
+      setWeigthVolumeUnit(singleProduct.uvw);
       setVat(singleProduct.tax);
       setOrigin(singleProduct.country);
       setPurchasePrice(singleProduct.purchase_price);
@@ -100,6 +108,9 @@ const EditProduct = () => {
   //  sub category add funsion
   const handleCategorySelect = (value) => {
     setSelectCategoryID(value);
+    setSelectCategoryName(
+      category.find((ctry) => ctry.id == value)?.category_name
+    );
   };
 
   const handleSelect = (selected) => {
@@ -190,6 +201,7 @@ const EditProduct = () => {
         product_type: "physical",
         unit: productUnit || "",
         long_description: productDescription || "",
+
         tax: vat || 0,
         country: origin || "",
         purchase_price: purchasePrice || 0,
@@ -201,9 +213,9 @@ const EditProduct = () => {
         subcategories: selectedSubCategoriesId,
         images: response.data.urls || [],
 
-        is_Stock: inStock || "",
+        in_stock: inStock || "",
         packaging: packaging || "",
-        weightVolumeUnit: weigthVolumeUnit || "",
+        uvw: weigthVolumeUnit || "",
       };
 
       try {
@@ -270,6 +282,7 @@ const EditProduct = () => {
                 <Select
                   placeholder="Select Packaging"
                   className="w-full h-12"
+                  value={packaging}
                   onChange={(value) => setPackaging(value)}
                 >
                   <Option value="lekillo">Le Kilo</Option>
@@ -277,7 +290,7 @@ const EditProduct = () => {
                   <Option value="Le Litre">Le Litre</Option>
                   <Option value="Le Colis">Le Colis</Option>
                   <Option value="La Palette">La Palette</Option>
-                  <Option value="---------">---------</Option>
+                  <Option value="">---------</Option>
                   <Option value="La Barquette">La Barquette</Option>
                   <Option value="Le Bocal">Le Bocal</Option>
                   <Option value="La Bouteille">La Bouteille</Option>
@@ -308,6 +321,7 @@ const EditProduct = () => {
                 <Input
                   placeholder="Unit"
                   className="py-3"
+                  value={weigthVolumeUnit}
                   onChange={(e) => setWeigthVolumeUnit(Number(e.target.value))}
                 />
               </div>
@@ -316,7 +330,7 @@ const EditProduct = () => {
                 <Select
                   placeholder="Product Unit"
                   className="w-full h-12"
-                  value={singleProduct.unit}
+                  value={productUnit}
                   onChange={(value) => setProductUnit(value)}
                 >
                   <Option value="KG (€ / KG)">KG (€ / KG)</Option>
@@ -336,6 +350,7 @@ const EditProduct = () => {
                   placeholder="1"
                   type="number"
                   className="py-3"
+                  value={inStock}
                   onChange={(e) => setInStock(Number(e.target.value))}
                 />
               </div>
@@ -346,7 +361,7 @@ const EditProduct = () => {
                   className="w-full h-12"
                   onSearch={onSearch}
                   showSearch
-                  value={singleProduct.country}
+                  value={origin}
                   onChange={(value) => setOrigin(value)}
                 >
                   {country.map((countrys, index) => (
@@ -361,13 +376,12 @@ const EditProduct = () => {
                 <Select
                   placeholder="Select VAT%"
                   className="w-full h-12"
-                  value={singleProduct.tax}
+                  value={vat}
                   onChange={(value) => setVat(value)}
                 >
                   <Option value="0">0</Option>
-                  <Option value="5">5</Option>
+                  <Option value="5.5">5.5</Option>
                   <Option value="10">10</Option>
-                  <Option value="15">15</Option>
                   <Option value="20">20</Option>
                 </Select>
               </div>
@@ -482,11 +496,7 @@ const EditProduct = () => {
                 <Select
                   placeholder="LÉGUMES"
                   className="w-full h-12"
-                  value={
-                    category.find(
-                      (ctry) => ctry.id == singleProduct.category_id
-                    )?.category_name
-                  }
+                  value={selectCategoryName}
                   onChange={handleCategorySelect}
                 >
                   {category.map((ctry) => (

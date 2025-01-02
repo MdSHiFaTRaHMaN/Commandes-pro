@@ -18,6 +18,10 @@ import { useForm, Controller } from "react-hook-form";
 import { API, useCategory, useCategoryWithSub } from "../../api/api";
 import { RiDeleteBin5Fill } from "react-icons/ri";
 import axios from "axios";
+import { FaEdit } from "react-icons/fa";
+import EditCategory from "./EditCategory";
+import EditSubCategory from "./EditSubCategory";
+import AddSubCategory from "./AddSubCategory";
 const { Option } = Select;
 const { Panel } = Collapse;
 
@@ -41,17 +45,13 @@ function beforeUpload(file) {
 
 const Categories = () => {
   // Separate states for category and sub-category image uploads
-  const { category } = useCategory();
-  const { categoryWithSub, refetch } = useCategoryWithSub();
 
-  const [subCategoryLoading, setSubCategoryLoading] = useState(false);
-  const [subCategoryImage, setSubCategoryImage] = useState();
-  const [subImage, setSubImage] = useState();
+  const { categoryWithSub, refetch } = useCategoryWithSub();
   const [loading, setLoading] = useState(false);
-  const [subLoading, setSubLoading] = useState(false);
-  const [mainCatId, setMainCatId] = useState(null);
-  const [subCategoryName, setSubCategoryName] = useState("");
-  const [subCategorySerial, setSubCategorySerial] = useState();
+  const [isEditCategoryOpen, setIsEditCategoryOpen] = useState(false);
+  const [categoryDetails, setCategoryDetails] = useState(null);
+  const [isEditSubCategoryOpen, setIsEditSubCategoryOpen] = useState(false);
+  const [subCategoryDetails, setSubCategoryDetails] = useState(null);
 
   const {
     control,
@@ -60,29 +60,6 @@ const Categories = () => {
     formState: { errors },
     reset,
   } = useForm();
-
-  const handleSubCategoryChange = (info) => {
-    if (info.file.status === "uploading") {
-      setSubCategoryLoading(true);
-      return;
-    }
-
-    setSubImage(info.file.originFileObj);
-    if (info.file.originFileObj) {
-      // Display the image locally without server upload
-      getBase64(info.file.originFileObj, (url) => {
-        setSubCategoryLoading(false);
-        setSubCategoryImage(url);
-      });
-    }
-  };
-
-  const uploadButton = (loading) => (
-    <div>
-      {loading ? <LoadingOutlined /> : <PlusOutlined />}
-      <div style={{ marginTop: 8 }}>Upload</div>
-    </div>
-  );
 
   const onSubmit = async (data) => {
     try {
@@ -105,7 +82,6 @@ const Categories = () => {
       const categoryImageUrl = response?.data?.url || "";
 
       const newCategory = {
-        sn_number: data.serial_number,
         category_name: data.category_name,
         category_image: categoryImageUrl,
       };
@@ -124,70 +100,6 @@ const Categories = () => {
         message.error("Something went wrong");
         setLoading(false);
       }
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  // save sub category
-  const handleSubSubmit = async (event) => {
-    event.preventDefault(); // Prevent default form submission behavior
-
-    // Validation for required fields
-    if (!mainCatId || !subCategoryName || !subCategoryImage) {
-      message.error("Please fill all fields!");
-      return;
-    }
-
-    try {
-      const formData = new FormData();
-      formData.append("pdf", subImage);
-
-      // Make a single POST request
-      const response = await axios.post(
-        "https://cloudinary.allbusinesssolution.com/api/v1/files/upload",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-
-      const subcategoryImageUrl = response.data.url || "";
-
-      // Prepare sub-category data
-      const subCategoryData = {
-        sn_number: subCategorySerial, // Dynamic serial number
-        main_cat_id: mainCatId,
-        name: subCategoryName,
-        image: subcategoryImageUrl,
-      };
-
-      try {
-        setSubLoading(true); // Show loading state
-
-        // API call to create sub-category
-        const response = await API.post("/subcategory/create", subCategoryData);
-
-        if (response.status === 200) {
-          message.success("Sub-category added successfully!");
-          refetch(); // Refresh category data (assuming `refetch` reloads categories)
-          // Reset form fields
-          setMainCatId(null);
-          setSubCategoryName("");
-          setSubCategoryImage(null);
-          setSubCategorySerial(null);
-        }
-
-        setSubLoading(false); // Hide loading state
-      } catch (error) {
-        console.error(error);
-        message.error("Something went wrong");
-        setSubLoading(false); // Hide loading state
-      }
-
-      // const categoryImageUrl = response?.data?.url || "";
     } catch (error) {
       console.error(error);
     }
@@ -218,6 +130,26 @@ const Categories = () => {
     });
   };
 
+  const handleEdit = (categoryDetails) => {
+    setCategoryDetails(categoryDetails);
+    setIsEditCategoryOpen(true);
+  };
+
+  const handleModalClose = () => {
+    setCategoryDetails(null); // Reset the details
+    setIsEditCategoryOpen(false); // Close modal
+  };
+
+  const handleSubCategoryEdit = (subCategoryDetails) => {
+    setSubCategoryDetails(subCategoryDetails);
+    setIsEditSubCategoryOpen(true);
+  };
+
+  const handleSubCategoryModalClose = () => {
+    setSubCategoryDetails(null); // Reset the details
+    setIsEditSubCategoryOpen(false); // Close modal
+  };
+
   const handleDeleteSub = (id) => {
     Modal.confirm({
       title: "Are you sure you want to delete this Sub Category?",
@@ -242,6 +174,7 @@ const Categories = () => {
       },
     });
   };
+
   return (
     <section className="text-gray-600 body-font">
       <div className="container px-5 py-24 mx-auto">
@@ -288,15 +221,6 @@ const Categories = () => {
                   />
                 </div>
 
-                <input
-                  type="number"
-                  placeholder="Serial Number"
-                  {...register("serial_number", {
-                    required: "Serial Number is required",
-                  })}
-                  className="py-4 mt-2 w-full border rounded px-3"
-                />
-
                 {/* Input for Category Name */}
                 <input
                   type="text"
@@ -330,74 +254,7 @@ const Categories = () => {
               <h2 className="text-2xl font-semibold my-3 text-PrimaryColor">
                 Add a Sub-Category
               </h2>
-              <form onSubmit={handleSubSubmit}>
-                <Upload
-                  name="avatar"
-                  listType="picture-card"
-                  className="avatar-uploader"
-                  showUploadList={false}
-                  action="https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload"
-                  beforeUpload={beforeUpload}
-                  onChange={handleSubCategoryChange}
-                >
-                  {subCategoryImage ? (
-                    <img
-                      src={subCategoryImage}
-                      alt="avatar"
-                      style={{
-                        width: "100%",
-                      }}
-                    />
-                  ) : (
-                    uploadButton(subCategoryLoading)
-                  )}
-                </Upload>
-
-                <Input
-                  placeholder="Serial Number"
-                  value={subCategorySerial}
-                  onChange={(e) => setSubCategorySerial(e.target.value)}
-                  className="py-3 mt-2"
-                />
-
-                {/* সাব-ক্যাটাগরি নাম */}
-                <Input
-                  placeholder="Sub-Category Name"
-                  value={subCategoryName}
-                  onChange={(e) => setSubCategoryName(e.target.value)}
-                  className="py-3 my-2"
-                />
-
-                {/* মেইন ক্যাটাগরি সিলেক্ট */}
-                <Select
-                  className="mb-4"
-                  showSearch
-                  style={{
-                    width: 400,
-                    height: 50,
-                  }}
-                  placeholder="Search to Select"
-                  optionFilterProp="children"
-                  value={mainCatId}
-                  onChange={(value) => setMainCatId(value)}
-                >
-                  {categoryWithSub.map((catgyName) => (
-                    <Option key={catgyName.id} value={catgyName.id}>
-                      {catgyName.name}
-                    </Option>
-                  ))}
-                </Select>
-
-                <Button
-                  type="primary"
-                  htmlType="submit"
-                  loading={subLoading}
-                  disabled={subLoading}
-                  className="w-full p-4 py-7 bg-PrimaryColor rounded text-white font-bold text-lg"
-                >
-                  Add to Sub-Category
-                </Button>
-              </form>
+              <AddSubCategory refetch={refetch} />
             </div>
           </div>
 
@@ -424,13 +281,20 @@ const Categories = () => {
                           {catry.name}
                         </div>
 
-                        {/* Delete Icon */}
-                        <span
-                          onClick={() => handleDelete(catry.id)}
-                          className="ml-auto text-end text-red-600"
-                        >
-                          <RiDeleteBin5Fill />
-                        </span>
+                        <div className="flex">
+                          <FaEdit
+                            className="cursor-pointer hover:text-blue-500 me-1"
+                            onClick={() => handleEdit(catry)}
+                          />
+
+                          {/* Delete Icon */}
+                          <span
+                            onClick={() => handleDelete(catry.id)}
+                            className="ml-auto text-end text-red-600"
+                          >
+                            <RiDeleteBin5Fill />
+                          </span>
+                        </div>
                       </div>
                     }
                     key={index}
@@ -441,21 +305,31 @@ const Categories = () => {
                         catry.sub_categories.map((sub, subIndex) => (
                           <li
                             key={subIndex}
-                            className="text-gray-600 text-left text-md font-semibold flex items-center gap-3 bg-gray-100 my-1"
+                            className="text-gray-600 text-left text-md font-semibold flex justify-between gap-3 bg-gray-100 my-1"
                           >
-                            <img
-                              src={sub.image}
-                              width={40}
-                              alt="subImage"
-                              className="rounded-md"
-                            />{" "}
-                            {sub.name}
-                            <span
-                              onClick={() => handleDeleteSub(sub.id)}
-                              className="ml-auto mr-2 text-red-500 cursor-pointer"
-                            >
-                              <RiDeleteBin5Fill />
-                            </span>
+                            <div className="flex items-center">
+                              <img
+                                src={sub.image}
+                                width={40}
+                                alt="subImage"
+                                className="rounded-md me-2"
+                              />
+                              {sub.name}
+                            </div>
+                            <div className="flex items-center text-[18px]">
+                              <FaEdit
+                                className="cursor-pointer hover:text-blue-500 me-1"
+                                onClick={() => handleSubCategoryEdit(sub)}
+                              />
+
+                              {/* Delete Icon */}
+                              <span
+                                onClick={() => handleDeleteSub(sub.id)}
+                                className="ml-auto cursor-pointer text-end text-red-600"
+                              >
+                                <RiDeleteBin5Fill />
+                              </span>
+                            </div>
                           </li>
                         ))
                       ) : (
@@ -471,6 +345,18 @@ const Categories = () => {
           </div>
         </div>
       </div>
+      <EditCategory
+        categoryDetails={categoryDetails}
+        isOpen={isEditCategoryOpen}
+        onClose={handleModalClose}
+        refetch={refetch}
+      />
+      <EditSubCategory
+        subCategoryDetails={subCategoryDetails}
+        isOpen={isEditSubCategoryOpen}
+        onClose={handleSubCategoryModalClose}
+        refetch={refetch}
+      />
     </section>
   );
 };
