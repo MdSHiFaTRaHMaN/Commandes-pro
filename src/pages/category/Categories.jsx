@@ -192,31 +192,43 @@ const Categories = () => {
                   <Controller
                     name="image"
                     control={control}
-                    render={({ field: { onChange, value } }) => (
-                      <Upload
-                        className="avatar-uploader"
-                        listType="picture-card"
-                        beforeUpload={() => false} // Prevent auto-upload
-                        maxCount={1}
-                        accept="image/*"
-                        fileList={value || []}
-                        onChange={({ fileList }) => onChange(fileList)}
-                        onPreview={(file) => {
-                          const src =
-                            file.url || URL.createObjectURL(file.originFileObj);
-                          const imgWindow = window.open(src);
-                          imgWindow.document.write(
-                            `<img src="${src}" style="width: 100%;" />`
-                          );
-                        }}
-                      >
-                        {value && value.length >= 1 ? null : (
-                          <div>
-                            <UploadOutlined />
-                            <div style={{ marginTop: 8 }}>Upload Image</div>
-                          </div>
+                    rules={{ required: "Image is required" }} // Image field required
+                    render={({
+                      field: { onChange, value },
+                      fieldState: { error },
+                    }) => (
+                      <>
+                        <Upload
+                          className="avatar-uploader"
+                          listType="picture-card"
+                          beforeUpload={() => false} // Prevent auto-upload
+                          maxCount={1}
+                          accept="image/*"
+                          fileList={value || []}
+                          onChange={({ fileList }) => onChange(fileList)}
+                          onPreview={(file) => {
+                            const src =
+                              file.url ||
+                              URL.createObjectURL(file.originFileObj);
+                            const imgWindow = window.open(src);
+                            imgWindow.document.write(
+                              `<img src="${src}" style="width: 100%;" />`
+                            );
+                          }}
+                        >
+                          {value && value.length >= 1 ? null : (
+                            <div>
+                              <UploadOutlined />
+                              <div style={{ marginTop: 8 }}>Upload Image</div>
+                            </div>
+                          )}
+                        </Upload>
+                        {error && (
+                          <p className="text-red-500 mt-[110px] ms-[-100px]">
+                            {error.message}
+                          </p>
                         )}
-                      </Upload>
+                      </>
                     )}
                   />
                 </div>

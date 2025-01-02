@@ -413,7 +413,7 @@ const EditOrder = () => {
         <Title level={3} className="text-pink-500 text-center mb-6">
           Modifier la Commande
         </Title>
-        <div>
+        <div className="hidden">
           <Text className="block mb-2 font-medium">Order number:</Text>
           <Input
             placeholder="Enter Your Order number"
